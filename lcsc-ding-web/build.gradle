@@ -1,0 +1,23 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven { url "http://maven.aliyun.com/nexus/content/groups/public" }
+        maven { url "http://repo.spring.io/snapshot" }
+        maven { url "http://repo.spring.io/milestone" }
+        jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.5.RELEASE")
+    }
+}
+apply plugin: 'org.springframework.boot'
+archivesBaseName = 'lcsc-ding-web'
+
+dependencies {
+    compile(project(':lcsc-ding-core'))
+    compile(project(':lcsc-ding-service'))
+
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+
+}
