@@ -12,4 +12,14 @@ public class Constant {
      * 开发者后台->企业自建应用->选择您创建的E应用->查看->AppSecret
      */
     public static final String APP_SECRET="_5yIhbpuRFJmHE7Y2vHrEbFoHY2HPiyAQZfv72TginbL9BOouXY8FuUGnAcCM9CS";
+
+    /**
+     * 用户session key
+     */
+    public static final String USER_SESSION_KEY = "userInfo";
+
+    /**
+     * 用户信息持久化文件
+     */
+    public static final String FILE_STORAGE_PATH = "/userInfo.data";
 }
