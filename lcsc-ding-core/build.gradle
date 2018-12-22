@@ -22,4 +22,8 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-web:$springBootVar"
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVar"
     compile fileTree(dir:'lib',includes:['*jar'])
+
+    // https://mvnrepository.com/artifact/joda-time/joda-time
+    compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+
 }
