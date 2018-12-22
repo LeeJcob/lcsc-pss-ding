@@ -34,8 +34,4 @@ public class AccessTokenUtil {
 
     }
 
-    public static void main(String[] args)throws ApiException{
-        String accessToken = AccessTokenUtil.getToken();
-        System.out.println(accessToken);
-    }
 }
