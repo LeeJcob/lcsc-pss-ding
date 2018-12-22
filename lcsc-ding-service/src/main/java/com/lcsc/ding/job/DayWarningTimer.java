@@ -69,7 +69,7 @@ public class DayWarningTimer {
                     OapiAttendanceListResponse attendance = DingUtil.getAttendanceByUserId(now, now, userId);
                     List<OapiAttendanceListResponse.Recordresult> recordresult = attendance.getRecordresult();
 
-                    if(CollectionUtils.isEmpty(recordresult)){
+                    if (CollectionUtils.isEmpty(recordresult)) {
 
                         recordresult = new ArrayList<>();
                     }

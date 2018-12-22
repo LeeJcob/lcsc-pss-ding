@@ -57,7 +57,7 @@ public class DingUtil {
         userInfoMap.put(response.getUserid(), response);
     }
 
-            public static Set<String> getUserIdList() {
+    public static Set<String> getUserIdList() {
 
         return userInfoMap.keySet();
     }
@@ -201,20 +201,25 @@ public class DingUtil {
     /**
      * 根据申请id获取申请详情
      */
-    public static void getProcessById(String processId) {
+    public static OapiProcessinstanceGetResponse.ProcessInstanceTopVo getProcessById(String processId) {
 
         DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/processinstance/get");
         OapiProcessinstanceGetRequest request = new OapiProcessinstanceGetRequest();
         request.setProcessInstanceId(processId);
         OapiProcessinstanceGetResponse response = null;
+        OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = null;
+
         try {
 
-            //TODO
             response = client.execute(request, AccessTokenUtil.getToken());
+            processInstanceTopVo = response.getProcessInstance();
 
         } catch (ApiException e) {
+
             e.printStackTrace();
         }
+
+        return processInstanceTopVo;
     }
 
 
@@ -235,6 +240,7 @@ public class DingUtil {
             response = client.execute(request, AccessTokenUtil.getToken());
 
         } catch (ApiException e) {
+
             e.printStackTrace();
         }
 
@@ -244,7 +250,7 @@ public class DingUtil {
 
     public static void main(String args[]) {
 
-        getProcessByCodeAndId("manager4081");
+        getProcessById("45285f52-a5a3-4bc9-9829-e82697cf47b0");
     }
 
 }

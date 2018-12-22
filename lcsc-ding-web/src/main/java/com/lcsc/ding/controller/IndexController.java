@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @RestController
 public class IndexController {
+
     private static final Logger bizLogger = LoggerFactory.getLogger(IndexController.class);
 
     @Autowired
@@ -121,6 +122,7 @@ public class IndexController {
     @RequestMapping(value = "/getAttendanceByUserId", method = RequestMethod.GET)
     @ResponseBody
     public void getAttendanceByUserId(String userId) {
+
         this.userService.getAttendanceByUserId(userId);
     }
 
