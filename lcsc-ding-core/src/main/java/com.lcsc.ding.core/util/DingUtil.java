@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
-import com.dingtalk.api.request.OapiAttendanceListRecordRequest;
+import com.dingtalk.api.request.OapiAttendanceListRequest;
 import com.dingtalk.api.request.OapiMessageCorpconversationAsyncsendV2Request;
 import com.dingtalk.api.request.OapiProcessinstanceGetRequest;
 import com.dingtalk.api.request.OapiProcessinstanceListidsRequest;
@@ -22,10 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DingUtil {
@@ -34,7 +31,7 @@ public class DingUtil {
     private static Map<String, OapiUserGetResponse> userInfoMap = new ConcurrentHashMap<String, OapiUserGetResponse>();
 
     //时间格式
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     /**
      * 存储user信息
@@ -58,6 +55,11 @@ public class DingUtil {
             e.printStackTrace();
         }
         userInfoMap.put(response.getUserid(), response);
+    }
+
+            public static Set<String> getUserIdList() {
+
+        return userInfoMap.keySet();
     }
 
     /**
@@ -219,22 +221,24 @@ public class DingUtil {
     /**
      * 根据时间段及用户获取考勤
      */
-    public static void getAttendanceByUserId(Date beginDate, Date endDate, String userId) {
+    public static OapiAttendanceListResponse getAttendanceByUserId(Date beginDate, Date endDate, String userId) {
 
-
-        DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/attendance/listRecord");
-        OapiAttendanceListRecordRequest request = new OapiAttendanceListRecordRequest();
-        request.setCheckDateFrom(simpleDateFormat.format(beginDate));
-        request.setCheckDateTo(simpleDateFormat.format(endDate));
-        request.setUserIds(Arrays.asList(userId));
-        OapiAttendanceListRecordResponse execute = null;
+        DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/attendance/list");
+        OapiAttendanceListRequest request = new OapiAttendanceListRequest();
+        request.setWorkDateFrom(simpleDateFormat.format(beginDate));
+        request.setWorkDateTo(simpleDateFormat.format(endDate));
+        request.setOffset(0l);
+        request.setLimit(50l);
+        request.setUserIdList(Arrays.asList(userId));
+        OapiAttendanceListResponse response = null;
         try {
-            execute = client.execute(request, AccessTokenUtil.getToken());
+            response = client.execute(request, AccessTokenUtil.getToken());
 
         } catch (ApiException e) {
             e.printStackTrace();
         }
 
+        return response;
     }
 
 

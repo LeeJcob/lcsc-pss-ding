@@ -31,4 +31,13 @@ public class Constant {
      */
     public static final String FILE_STORAGE_PATH = "/userInfo.data";
 
+    /**
+     * 节假日配置文件
+     */
+    public static final String FILE_HOLIDAY_EXCEL_PATH = "/holiday.txt";
+
+    /**
+     * 工作日配置文件
+     */
+    public static final String FILE_WORKDAY_EXCEL_PATH = "/workday.txt";
 }
