@@ -55,6 +55,7 @@ public class DingUtil {
             e.printStackTrace();
         }
         userInfoMap.put(response.getUserid(), response);
+        System.out.println(userInfoMap);
     }
 
     public static Set<String> getUserIdList() {

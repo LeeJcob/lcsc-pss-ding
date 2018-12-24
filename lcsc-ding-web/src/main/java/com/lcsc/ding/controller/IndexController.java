@@ -6,6 +6,7 @@ import com.dingtalk.api.request.OapiUserGetRequest;
 import com.dingtalk.api.request.OapiUserGetuserinfoRequest;
 import com.dingtalk.api.response.OapiUserGetResponse;
 import com.dingtalk.api.response.OapiUserGetuserinfoResponse;
+import com.lcsc.ding.core.UserModel;
 import com.lcsc.ding.core.constant.Constant;
 import com.lcsc.ding.core.constant.URLConstant;
 import com.lcsc.ding.core.util.AccessTokenUtil;
@@ -75,10 +76,14 @@ public class IndexController {
         //3.查询得到当前用户的userId
         // 获得到userId之后应用应该处理应用自身的登录会话管理（session）,避免后续的业务交互（前端到应用服务端）每次都要重新获取用户身份，提升用户体验
         String userId = response.getUserid();
+        UserModel userModel = new UserModel();
+        userModel.setUserId(userId);
 
         String userName = saveAndUserLogin(accessToken, userId);
+        userModel.setUserName(userName);
+
         //返回结果
-        return ServiceResult.success(userName);
+        return ServiceResult.success(userModel);
     }
 
     /**
