@@ -19,9 +19,9 @@ public class StatisticsController {
     /**
      * 根据年 - 月 查询迟到详情接口
      */
-    public ServiceResult getLateList(Integer month,Integer day) {
+    public ServiceResult getLateList(Integer year,Integer month) {
 
-        return null;
+        return statisticsService.getLateList(year,month);
     }
 
 
