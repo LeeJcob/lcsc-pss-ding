@@ -1,4 +1,4 @@
-package com.lcsc.ding.core;
+package com.lcsc.ding.core.model;
 
 public class UserModel {
     private String userId;

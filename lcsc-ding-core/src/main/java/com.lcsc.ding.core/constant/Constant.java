@@ -40,4 +40,41 @@ public class Constant {
      * 工作日配置文件
      */
     public static final String FILE_WORKDAY_EXCEL_PATH = "/workday.txt";
+
+    /**
+     * 正常
+     */
+    public static final String TIMERESULT_NORMAL = "Normal";
+    /**
+     * 早退
+     */
+    public static final String TIMERESULT_EARLY = "Early";
+    /**
+     * 迟到
+     */
+    public static final String TIMERESULT_LATE = "Late";
+    /**
+     * 严重迟到
+     */
+    public static final String TIMERESULT_SERIOUSLATE = "SeriousLate";
+    /**
+     * 旷工迟到
+     */
+    public static final String TIMERESULT_ABSENTEEISM = "Absenteeism";
+    /**
+     * 未打卡
+     */
+    public static final String TIMERESULT_NOTSIGNED = "NotSigned";
+
+    /**
+     * 上班卡
+     */
+    public static final String CHECKTYPE_ONDUTY = "OnDuty";
+
+    /**
+     * 下班卡
+     */
+    public static final String CHECKTYPE_OFFDUTY = "OffDuty";
+
+
 }
