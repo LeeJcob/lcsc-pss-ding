@@ -1,6 +1,11 @@
 package com.lcsc.ding.service;
 
+import com.lcsc.ding.core.model.LateModel;
+import com.lcsc.ding.core.model.NoSignModel;
+import com.lcsc.ding.core.model.SubsidyModel;
 import com.lcsc.ding.core.util.ServiceResult;
+
+import java.util.List;
 
 /**
  * 统计接口
@@ -9,9 +14,26 @@ public interface StatisticsService {
 
     /**
      * 查询一个月内除去迟到免扣款后的迟到次数及时长
+     * @param year
      * @param month
-     * @param day
      * @return
      */
-    ServiceResult getLateList(Integer month, Integer day);
+    ServiceResult getLateList(Integer year, Integer month);
+
+
+    /**
+     * 查询一个月内漏打卡
+     * @param month
+     * @param month
+     * @return
+     */
+    ServiceResult<List<NoSignModel>> getNoSignList(Integer year, Integer month);
+
+    /**
+     * 查询一个月的交通补贴
+     * @param year
+     * @param month
+     * @return
+     */
+    ServiceResult<List<SubsidyModel>> getSubsidyList(Integer year, Integer month);
 }

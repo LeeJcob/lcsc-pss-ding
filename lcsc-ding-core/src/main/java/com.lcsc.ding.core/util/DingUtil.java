@@ -250,8 +250,8 @@ public class DingUtil {
 
 
     public static void main(String args[]) {
-
-        getProcessById("45285f52-a5a3-4bc9-9829-e82697cf47b0");
+        getAttendanceByUserId(new Date(),new Date(),"manager4081");
+      //  getProcessById("45285f52-a5a3-4bc9-9829-e82697cf47b0");
     }
 
 }

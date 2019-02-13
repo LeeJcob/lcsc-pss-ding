@@ -76,5 +76,15 @@ public class Constant {
      */
     public static final String CHECKTYPE_OFFDUTY = "OffDuty";
 
+    /**
+     * 审批同意
+     */
+    public static final String PROCESS_RESULT_AGREE = "agree";
+
+    /**
+     * 审批拒绝
+     */
+    public static final String PROCESS_RESULT_REFUSE = "refuse";
+
 
 }

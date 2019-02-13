@@ -1,7 +1,11 @@
 package com.lcsc.ding.service.impl;
 
 import com.dingtalk.api.response.OapiAttendanceListResponse;
+import com.dingtalk.api.response.OapiProcessinstanceGetResponse;
 import com.lcsc.ding.core.constant.Constant;
+import com.lcsc.ding.core.model.LateModel;
+import com.lcsc.ding.core.model.NoSignModel;
+import com.lcsc.ding.core.model.SubsidyModel;
 import com.lcsc.ding.core.util.DingUtil;
 import com.lcsc.ding.core.util.ServiceResult;
 import com.lcsc.ding.service.StatisticsService;
@@ -11,6 +15,7 @@ import org.joda.time.Period;
 import org.joda.time.PeriodType;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +27,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
 
     @Override
-    public ServiceResult getLateList(Integer year, Integer month) {
+    public ServiceResult<List<LateModel>> getLateList(Integer year, Integer month) {
 
         // 获取当前用户  TODO
         String userId = "manager4081";
@@ -34,7 +39,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
 
         DateTime endDay = null;
-
+        List<LateModel> lateModels = new ArrayList<>();
         // 考勤结果
         OapiAttendanceListResponse response = null;
 
@@ -43,18 +48,31 @@ public class StatisticsServiceImpl implements StatisticsService {
             response = DingUtil.getAttendanceByUserId(dateTime.toDate(), endDay.toDate(), userId);
 
             //根据考勤结果  解析异常考勤
-            judge(response);
+            lateModels.addAll(judge(response));
 
             dateTime = endDay.plusDays(1);
         }
 
 
+        return ServiceResult.success(lateModels);
+    }
+
+    @Override
+    public ServiceResult<List<NoSignModel>> getNoSignList(Integer year, Integer month) {
+
+
+        return null;
+    }
+
+    @Override
+    public ServiceResult<List<SubsidyModel>> getSubsidyList(Integer year, Integer month) {
         return null;
     }
 
 
-    public static void judge(OapiAttendanceListResponse response) {
+    public static List<LateModel> judge(OapiAttendanceListResponse response) {
 
+        List<LateModel> lateModels = new ArrayList<>();
         List<OapiAttendanceListResponse.Recordresult> recordresultList = response.getRecordresult();
 
         String timeResult = "";
@@ -79,25 +97,40 @@ public class StatisticsServiceImpl implements StatisticsService {
             timeResult = recordresult.getTimeResult();
 
             if (Constant.TIMERESULT_LATE.equals(timeResult) || Constant.TIMERESULT_SERIOUSLATE.equals(timeResult) || Constant.TIMERESULT_ABSENTEEISM.equals(timeResult)) {
+                LateModel lateModel = new LateModel();
+
+                lateModel.setLateDay(recordresult.getWorkDate());
 
 
+                lateModel.setHasProcess(Boolean.FALSE);
                 userCheckTime = recordresult.getUserCheckTime();
+                lateModel.setSignTime(userCheckTime);
                 DateTime user = new DateTime(userCheckTime);
                 Period p = new Period(baseCheckDate, user, PeriodType.minutes());
 
-                lateMinutes = lateMinutes + p.getMinutes();
+                //  lateMinutes = lateMinutes + p.getMinutes();
 
+                lateModel.setLateMinutes(p.getMinutes());
                 // 迟到有相关的审批
                 if (StringUtils.isNotEmpty(recordresult.getProcInstId())) {
 
-                    DingUtil.getProcessById(recordresult.getProcInstId());
+                    OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(recordresult.getProcInstId());
+
+                    if (Constant.PROCESS_RESULT_AGREE.equals(processInstanceTopVo.getResult())) {
+
+                        //  审批是否通过
+                        lateModel.setHasProcess(Boolean.TRUE);
+                    }
 
                 }
 
+                lateModels.add(lateModel);
             }
 
             System.out.println(lateMinutes);
+
         }
+        return lateModels;
     }
 
 
