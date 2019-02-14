@@ -9,15 +9,14 @@ import com.lcsc.ding.core.model.SubsidyModel;
 import com.lcsc.ding.core.util.DingUtil;
 import com.lcsc.ding.core.util.ServiceResult;
 import com.lcsc.ding.service.StatisticsService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 统计相关接口实现
@@ -27,8 +26,9 @@ public class StatisticsServiceImpl implements StatisticsService {
 
 
     @Override
-    public ServiceResult<List<LateModel>> getLateList(Integer year, Integer month) {
+    public ServiceResult<Map<String, Object>> getLateList(Integer year, Integer month) {
 
+        Map<String, Object> result = new HashMap<>();
         // 获取当前用户  TODO
         String userId = "manager4081";
 
@@ -53,8 +53,19 @@ public class StatisticsServiceImpl implements StatisticsService {
             dateTime = endDay.plusDays(1);
         }
 
+        Integer totalMinutes = 0;
+        for (LateModel lateModel : lateModels) {
 
-        return ServiceResult.success(lateModels);
+            if (!lateModel.getHasProcess()) {
+
+                totalMinutes = totalMinutes + lateModel.getLateMinutes();
+            }
+
+        }
+
+        result.put("totalMinutes", totalMinutes);
+        result.put("late", lateModels);
+        return ServiceResult.success(result);
     }
 
     @Override
@@ -74,6 +85,11 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         List<LateModel> lateModels = new ArrayList<>();
         List<OapiAttendanceListResponse.Recordresult> recordresultList = response.getRecordresult();
+
+        if (CollectionUtils.isEmpty(recordresultList)) {
+
+            return lateModels;
+        }
 
         String timeResult = "";
 

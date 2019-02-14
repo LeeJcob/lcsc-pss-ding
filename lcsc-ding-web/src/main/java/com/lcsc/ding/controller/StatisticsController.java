@@ -1,6 +1,5 @@
 package com.lcsc.ding.controller;
 
-import com.lcsc.ding.core.model.LateModel;
 import com.lcsc.ding.core.model.NoSignModel;
 import com.lcsc.ding.core.model.SubsidyModel;
 import com.lcsc.ding.core.util.ServiceResult;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 页面统计接口
@@ -25,7 +25,7 @@ public class StatisticsController {
      */
 
     @GetMapping("/late/list")
-    public ServiceResult<List<LateModel>> getLateList(Integer year, Integer month) {
+    public ServiceResult<Map<String, Object>> getLateList(Integer year, Integer month) {
 
         return this.statisticsService.getLateList(year, month);
     }

@@ -1,8 +1,9 @@
 package com.lcsc.ding.core.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class LateModel {
+public class LateModel implements Serializable {
 
     private Date lateDay;
 

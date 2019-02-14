@@ -6,6 +6,7 @@ import com.lcsc.ding.core.model.SubsidyModel;
 import com.lcsc.ding.core.util.ServiceResult;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 统计接口
@@ -18,7 +19,7 @@ public interface StatisticsService {
      * @param month
      * @return
      */
-    ServiceResult getLateList(Integer year, Integer month);
+    ServiceResult<Map<String, Object>> getLateList(Integer year, Integer month);
 
 
     /**
