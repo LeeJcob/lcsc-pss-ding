@@ -20,7 +20,12 @@ public class Constant {
     public static final String CORPID = "ding251335d31062a7f535c2f4657eb6378f";
 
     //请假审批
-    public static final String processCode = "PROC-F18CD967-8E97-4D1E-A08E-C744DF73DA8E";
+    public static final String LEAVE_PROCESS_CODE = "PROC-F18CD967-8E97-4D1E-A08E-C744DF73DA8E";
+
+    //车费报销审批  TODO
+    public static final String SUBSIDY_PROCESS_CODE = "PROC-F18CD967-8E97-4D1E-A08E-C744DF73DA8E";
+
+
     /**
      * 用户session key
      */

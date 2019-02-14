@@ -163,14 +163,13 @@ public class DingUtil {
     /**
      * 根据审批code及用户获取审批id
      */
-    public static List<String> getProcessByCodeAndId(String userIds) {
+    public static List<String> getProcessByCodeAndId(String processCode, String userIds, Date start, Date end) {
 
         DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/processinstance/listids");
         OapiProcessinstanceListidsRequest req = new OapiProcessinstanceListidsRequest();
-        req.setProcessCode(Constant.processCode);
-        DateTime dateTime = new DateTime();
-        req.setStartTime(dateTime.minusDays(1).getMillis());
-        req.setEndTime(dateTime.getMillis());
+        req.setProcessCode(processCode);
+        req.setStartTime(start.getTime());
+        req.setEndTime(end.getTime());
         req.setSize(10L);
         req.setCursor(0L);
         req.setUseridList(userIds);
@@ -250,8 +249,12 @@ public class DingUtil {
 
 
     public static void main(String args[]) {
-        getAttendanceByUserId(new Date(),new Date(),"manager4081");
-      //  getProcessById("45285f52-a5a3-4bc9-9829-e82697cf47b0");
+        DateTime dateTime = new DateTime(2018, 12, 1, 0, 0);
+
+        // 当月最后一天
+        DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
+        getProcessByCodeAndId(Constant.LEAVE_PROCESS_CODE,"manager4081",dateTime.toDate(),lastDay.toDate() );
+        //  getProcessById("45285f52-a5a3-4bc9-9829-e82697cf47b0");
     }
 
 }

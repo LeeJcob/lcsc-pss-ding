@@ -77,7 +77,32 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public ServiceResult<List<SubsidyModel>> getSubsidyList(Integer year, Integer month) {
-        return null;
+        // 获取当前用户  TODO
+        String userId = "manager4081";
+        List<SubsidyModel> subsidyModels =  new ArrayList<>();
+        // 获取用户所有的报销申请
+        DateTime dateTime = new DateTime(2018, 12, 1, 0, 0);
+
+        // 当月最后一天
+        DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
+        List<String> processIds = DingUtil.getProcessByCodeAndId(Constant.SUBSIDY_PROCESS_CODE, userId, dateTime.toDate(), lastDay.toDate());
+
+        for (String process : processIds) {
+
+            // 查询对应的审批
+            OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(process);
+            if (Constant.PROCESS_RESULT_AGREE.equals(processInstanceTopVo.getResult())) {
+
+                SubsidyModel subsidyModel =  new SubsidyModel();
+                //  审批是否通过    金额   日期  等
+
+
+                subsidyModels.add(subsidyModel);
+            }
+        }
+
+
+        return ServiceResult.success(subsidyModels);
     }
 
 
@@ -142,8 +167,6 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                 lateModels.add(lateModel);
             }
-
-            System.out.println(lateMinutes);
 
         }
         return lateModels;
