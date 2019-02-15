@@ -11,12 +11,12 @@ public class LateModel implements Serializable {
     /**
      * 日期
      */
-    private Date lateDay;
+    private String lateDay;
 
     /**
      * 签到时间
      */
-    private Date signTime;
+    private String signTime;
 
     /**
      * 迟到分钟
@@ -28,19 +28,19 @@ public class LateModel implements Serializable {
      */
     private Boolean hasProcess;
 
-    public Date getLateDay() {
+    public String getLateDay() {
         return lateDay;
     }
 
-    public void setLateDay(Date lateDay) {
+    public void setLateDay(String lateDay) {
         this.lateDay = lateDay;
     }
 
-    public Date getSignTime() {
+    public String getSignTime() {
         return signTime;
     }
 
-    public void setSignTime(Date signTime) {
+    public void setSignTime(String signTime) {
         this.signTime = signTime;
     }
 

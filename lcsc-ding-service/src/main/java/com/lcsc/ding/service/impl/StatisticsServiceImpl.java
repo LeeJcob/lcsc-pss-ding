@@ -17,6 +17,7 @@ import org.joda.time.Period;
 import org.joda.time.PeriodType;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -179,6 +180,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     public static List<LateModel> judge(OapiAttendanceListResponse response) {
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<LateModel> lateModels = new ArrayList<>();
         List<OapiAttendanceListResponse.Recordresult> recordresultList = response.getRecordresult();
 
@@ -211,12 +213,12 @@ public class StatisticsServiceImpl implements StatisticsService {
             if (Constant.TIMERESULT_LATE.equals(timeResult) || Constant.TIMERESULT_SERIOUSLATE.equals(timeResult) || Constant.TIMERESULT_ABSENTEEISM.equals(timeResult)) {
                 LateModel lateModel = new LateModel();
 
-                lateModel.setLateDay(recordresult.getWorkDate());
+                lateModel.setLateDay(sdf.format(recordresult.getWorkDate()));
 
 
                 lateModel.setHasProcess(Boolean.FALSE);
                 userCheckTime = recordresult.getUserCheckTime();
-                lateModel.setSignTime(userCheckTime);
+                lateModel.setSignTime(sdf.format(userCheckTime));
                 DateTime user = new DateTime(userCheckTime);
                 Period p = new Period(baseCheckDate, user, PeriodType.minutes());
 
