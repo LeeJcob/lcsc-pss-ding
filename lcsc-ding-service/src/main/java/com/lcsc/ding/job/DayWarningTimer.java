@@ -19,7 +19,7 @@ public class DayWarningTimer {
 
         try {
 
-            boolean workDay = new HolidayUtil().isWorkDay();
+            boolean workDay = new HolidayUtil().isWorkDay(null);
 
             // 是工作日就开始核查打卡信息
             if (workDay) {
@@ -35,7 +35,7 @@ public class DayWarningTimer {
 
                     if (CollectionUtils.isEmpty(recordresult)) {
 
-                        DingUtil.push(userId, "尊敬的用户你好，今日你忘记打上班卡了哦");
+                        DingUtil.push(userId, "尊敬的用户你好，今日你忘记打上班卡了哦，请及时补卡");
                     }
                 }
 
@@ -51,7 +51,7 @@ public class DayWarningTimer {
 
         try {
 
-            boolean workDay = new HolidayUtil().isWorkDay();
+            boolean workDay = new HolidayUtil().isWorkDay(null);
 
             // 是工作日就开始核查打卡信息
             if (workDay) {
@@ -86,7 +86,7 @@ public class DayWarningTimer {
 
                     if (isException) {
 
-                        DingUtil.push(userId, "尊敬的用户你好，今日你忘记打下班卡了哦");
+                        DingUtil.push(userId, "尊敬的用户你好，今日你忘记打下班卡了哦，请及时补卡");
                     }
                 }
 

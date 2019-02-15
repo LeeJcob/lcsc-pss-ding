@@ -2,6 +2,7 @@ package com.lcsc.ding.core.util;
 
 import com.lcsc.ding.core.constant.Constant;
 import org.apache.commons.io.FileUtils;
+import org.joda.time.DateTime;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
@@ -19,24 +20,30 @@ public class HolidayUtil {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private List<String> holidays = new ArrayList<String>();
     private List<String> workdays = new ArrayList<String>();
-    private Date now = new Date();
 
     /**
      * 判断当天是否是工作日 (工作日：true；节假日：false)
      *
      * @return
      */
-    public boolean isWorkDay() {
+    public boolean isWorkDay(Date dateTime) {
+
+        if(null==dateTime){
+
+            dateTime = new Date();
+        }
+
         boolean flag = true;
 
         initConfig();
 
-        int dateType = getDateType();
+        int dateType = getDateType(dateTime);
 
         //如果excel不存在当前日期。判断是否周六日
         if (dateType == 0) {
 
             Calendar c = Calendar.getInstance();
+            c.setTime(dateTime);
             if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ||
                     c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
                 flag = false;
@@ -60,10 +67,10 @@ public class HolidayUtil {
      *
      * @return
      */
-    private int getDateType() {
+    private int getDateType(Date dateTime) {
         int type = 0;
 
-        String today = sdf.format(now);
+        String today = sdf.format(dateTime);
 
         if (holidays.size() > 0) {
             for (String holiday : holidays) {

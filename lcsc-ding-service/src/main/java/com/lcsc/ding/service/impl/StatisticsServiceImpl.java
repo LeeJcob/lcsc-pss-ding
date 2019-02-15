@@ -7,6 +7,7 @@ import com.lcsc.ding.core.model.LateModel;
 import com.lcsc.ding.core.model.NoSignModel;
 import com.lcsc.ding.core.model.SubsidyModel;
 import com.lcsc.ding.core.util.DingUtil;
+import com.lcsc.ding.core.util.HolidayUtil;
 import com.lcsc.ding.core.util.ServiceResult;
 import com.lcsc.ding.service.StatisticsService;
 import org.apache.commons.collections.CollectionUtils;
@@ -71,8 +72,78 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public ServiceResult<List<NoSignModel>> getNoSignList(Integer year, Integer month) {
 
+        // 获取当前用户  TODO
+        String userId = "manager4081";
 
-        return null;
+        // 当月第一天
+        DateTime dateTime = new DateTime(year, month, 1, 0, 0);
+
+        // 当月最后一天
+        DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
+
+        DateTime tempDate = dateTime;
+
+        Set<Integer>  allMonthDaySet = new HashSet<>();
+
+        Set<Integer>  allSignOutSet = new HashSet<>();
+
+        // 先把所有日期存起来,并排除掉假期
+        while (lastDay.isAfter(tempDate)){
+
+            boolean isWorkDay = new HolidayUtil().isWorkDay(tempDate.toDate());
+            if(isWorkDay){
+
+                allMonthDaySet.add(tempDate.getDayOfMonth());
+                allSignOutSet.add(tempDate.getDayOfMonth());
+            }
+            tempDate = tempDate.plusDays(1);
+        }
+
+        DateTime endDay = null;
+
+        // 考勤结果
+        OapiAttendanceListResponse response = null;
+
+        while (lastDay.isAfter(endDay = getLastDayOfWeek(dateTime)) || lastDay.isEqual(endDay)) {
+
+            response = DingUtil.getAttendanceByUserId(dateTime.toDate(), endDay.toDate(), userId);
+
+            //根据考勤结果  解析漏打卡的
+            List<OapiAttendanceListResponse.Recordresult> recordresultList = response.getRecordresult();
+
+            // 循环打卡记录
+            for (OapiAttendanceListResponse.Recordresult recordResult:recordresultList) {
+
+                // 如果有打卡记录，且时间结果不是未打卡
+                if(!"NotSigned".equals(recordResult.getTimeResult())){
+
+                    if("OnDuty".equals(recordResult.getCheckType())){
+
+                        allMonthDaySet.remove(new DateTime(recordResult.getUserCheckTime()).getDayOfMonth());
+                    }else{
+
+                        allSignOutSet.remove(new DateTime(recordResult.getUserCheckTime()).getDayOfMonth());
+                    }
+                }
+            }
+
+            dateTime = endDay.plusDays(1);
+        }
+
+        List<NoSignModel> noSignModelList = new ArrayList<>();
+
+        // 统计出没有打卡的
+        for (Integer dayOfMonth:allMonthDaySet) {
+
+            DateTime lackTime = new DateTime(year, month, dayOfMonth, 9, 0);
+
+
+        }
+
+        // 获取所有的 漏卡补签 申请
+
+
+        return ServiceResult.success(noSignModelList);
     }
 
     @Override
