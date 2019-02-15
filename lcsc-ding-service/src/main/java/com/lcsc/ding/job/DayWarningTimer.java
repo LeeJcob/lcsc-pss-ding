@@ -46,7 +46,7 @@ public class DayWarningTimer {
         }
     }
 
-    @Scheduled(cron = "0 30 6,8,10 * * *")
+    @Scheduled(cron = "0 30 18,20,22 * * *")
     public void signOutTimer() {
 
         try {
