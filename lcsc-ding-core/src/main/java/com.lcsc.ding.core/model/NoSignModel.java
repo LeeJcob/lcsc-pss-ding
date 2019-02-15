@@ -2,12 +2,24 @@ package com.lcsc.ding.core.model;
 
 import java.util.Date;
 
+/**
+ * 漏卡详情
+ */
 public class NoSignModel {
 
+    /**
+     * 日期
+     */
     private Date noSignDay;
 
+    /**
+     * 未打卡时间
+     */
     private Date noSignTime;
 
+    /**
+     * 是否申请审批
+     */
     private Boolean hasProcess;
 
     public Date getNoSignDay() {
