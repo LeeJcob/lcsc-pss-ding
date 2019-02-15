@@ -28,11 +28,11 @@ public class StatisticsServiceImpl implements StatisticsService {
 
 
     @Override
-    public ServiceResult<Map<String, Object>> getLateList(Integer year, Integer month) {
+    public ServiceResult<Map<String, Object>> getLateList(String userId,Integer year, Integer month) {
 
         Map<String, Object> result = new HashMap<>();
         // 获取当前用户  TODO
-        String userId = "manager4081";
+       // String userId = "manager4081";
 
         // 当月第一天
         DateTime dateTime = new DateTime(year, month, 1, 0, 0);

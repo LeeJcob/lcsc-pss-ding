@@ -25,9 +25,9 @@ public class StatisticsController {
      */
 
     @GetMapping("/late/list")
-    public ServiceResult<Map<String, Object>> getLateList(Integer year, Integer month) {
+    public ServiceResult<Map<String, Object>> getLateList(String userid, Integer year, Integer month) {
 
-        return this.statisticsService.getLateList(year, month);
+        return this.statisticsService.getLateList(userid, year, month);
     }
 
     /**
