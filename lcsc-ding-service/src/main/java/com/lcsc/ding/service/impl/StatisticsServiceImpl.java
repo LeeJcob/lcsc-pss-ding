@@ -120,7 +120,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 }
 
                 // 如果有打卡记录，且时间结果不是未打卡
-                if (!"NotSigned".equals(recordResult.getTimeResult())) {
+                if ("NotSigned".equals(recordResult.getTimeResult())) {
 
                     NoSignModel noSignModel = new NoSignModel();
                     noSignModel.setNoSignDay(recordResult.getWorkDate());
