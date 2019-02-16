@@ -38,9 +38,9 @@ public class StatisticsController {
      * @return
      */
     @GetMapping("/nosign/list")
-    public ServiceResult<List<NoSignModel>> getNoSignList(Integer year, Integer month) {
+    public ServiceResult<List<NoSignModel>> getNoSignList(String userid,Integer year, Integer month) {
 
-        return this.statisticsService.getNoSignList(year, month);
+        return this.statisticsService.getNoSignList(userid,year, month);
     }
 
 

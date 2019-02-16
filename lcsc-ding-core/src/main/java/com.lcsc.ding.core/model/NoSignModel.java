@@ -1,5 +1,6 @@
 package com.lcsc.ding.core.model;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -7,35 +8,40 @@ import java.util.Date;
  */
 public class NoSignModel {
 
+    //时间格式
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     /**
      * 日期
      */
-    private Date noSignDay;
+    private String noSignDay;
 
     /**
      * 未打卡时间
      */
-    private Date noSignTime;
+    private String noSignTime;
 
     /**
      * 是否申请审批
      */
     private Boolean hasProcess;
 
-    public Date getNoSignDay() {
+    public String getNoSignDay() {
         return noSignDay;
     }
 
     public void setNoSignDay(Date noSignDay) {
-        this.noSignDay = noSignDay;
+
+        this.noSignDay = simpleDateFormat.format(noSignDay);
     }
 
-    public Date getNoSignTime() {
+    public String getNoSignTime() {
         return noSignTime;
     }
 
     public void setNoSignTime(Date noSignTime) {
-        this.noSignTime = noSignTime;
+
+        this.noSignTime = simpleDateFormat.format(noSignTime);
     }
 
     public Boolean getHasProcess() {

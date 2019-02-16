@@ -1,6 +1,5 @@
 package com.lcsc.ding.service;
 
-import com.lcsc.ding.core.model.LateModel;
 import com.lcsc.ding.core.model.NoSignModel;
 import com.lcsc.ding.core.model.SubsidyModel;
 import com.lcsc.ding.core.util.ServiceResult;
@@ -25,11 +24,12 @@ public interface StatisticsService {
 
     /**
      * 查询一个月内漏打卡
-     * @param month
+     *
+     * @param userid
      * @param month
      * @return
      */
-    ServiceResult<List<NoSignModel>> getNoSignList(Integer year, Integer month);
+    ServiceResult<List<NoSignModel>> getNoSignList(String userid, Integer year, Integer month);
 
     /**
      * 查询一个月的交通补贴

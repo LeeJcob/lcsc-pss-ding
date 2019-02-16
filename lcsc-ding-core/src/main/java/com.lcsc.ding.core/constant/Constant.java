@@ -25,6 +25,8 @@ public class Constant {
     //车费报销审批  TODO
     public static final String SUBSIDY_PROCESS_CODE = "PROC-F18CD967-8E97-4D1E-A08E-C744DF73DA8E";
 
+    // 补卡审批
+    public static final String LACK_CARD_PROCESS_CODE = "PROC-F18CD967-8E97-4D1E-A08E-C744DF73DA8E";
 
     /**
      * 用户session key
