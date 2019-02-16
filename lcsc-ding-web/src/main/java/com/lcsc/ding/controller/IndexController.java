@@ -6,17 +6,15 @@ import com.dingtalk.api.request.OapiUserGetRequest;
 import com.dingtalk.api.request.OapiUserGetuserinfoRequest;
 import com.dingtalk.api.response.OapiUserGetResponse;
 import com.dingtalk.api.response.OapiUserGetuserinfoResponse;
-import com.lcsc.ding.core.model.UserModel;
 import com.lcsc.ding.core.constant.Constant;
 import com.lcsc.ding.core.constant.URLConstant;
+import com.lcsc.ding.core.model.UserModel;
 import com.lcsc.ding.core.util.AccessTokenUtil;
 import com.lcsc.ding.core.util.DingUtil;
 import com.lcsc.ding.core.util.ServiceResult;
-import com.lcsc.ding.service.UserService;
 import com.taobao.api.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,8 +33,6 @@ public class IndexController {
 
     private static final Logger bizLogger = LoggerFactory.getLogger(IndexController.class);
 
-    @Autowired
-    private UserService userService;
 
     /**
      * 欢迎页面,通过url访问，判断后端服务是否启动
@@ -44,7 +40,6 @@ public class IndexController {
     @RequestMapping(value = "/welcome", method = RequestMethod.GET)
     public String welcome() {
 
-        userService.test();
         return "welcome";
     }
 
@@ -116,19 +111,6 @@ public class IndexController {
         }
     }
 
-
-    /**
-     * 获取用户考勤记录
-     *
-     * @param userId
-     * @return
-     */
-    @RequestMapping(value = "/getAttendanceByUserId", method = RequestMethod.GET)
-    @ResponseBody
-    public void getAttendanceByUserId(String userId) {
-
-        this.userService.getAttendanceByUserId(userId);
-    }
 
 }
 

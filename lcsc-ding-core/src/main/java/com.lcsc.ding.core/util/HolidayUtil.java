@@ -2,7 +2,6 @@ package com.lcsc.ding.core.util;
 
 import com.lcsc.ding.core.constant.Constant;
 import org.apache.commons.io.FileUtils;
-import org.joda.time.DateTime;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
@@ -28,7 +27,7 @@ public class HolidayUtil {
      */
     public boolean isWorkDay(Date dateTime) {
 
-        if(null==dateTime){
+        if (null == dateTime) {
 
             dateTime = new Date();
         }

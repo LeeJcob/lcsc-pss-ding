@@ -9,7 +9,7 @@ import javax.annotation.PostConstruct;
 public class UserInfoInitializer {
 
     @PostConstruct
-    private void init(){
+    private void init() {
 
         // 初始化加载用户信息
         DingUtil.initUserInfoMap();

@@ -1,6 +1,5 @@
 package com.lcsc.ding.core.util;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
@@ -8,7 +7,11 @@ import com.dingtalk.api.request.OapiAttendanceListRequest;
 import com.dingtalk.api.request.OapiMessageCorpconversationAsyncsendV2Request;
 import com.dingtalk.api.request.OapiProcessinstanceGetRequest;
 import com.dingtalk.api.request.OapiProcessinstanceListidsRequest;
-import com.dingtalk.api.response.*;
+import com.dingtalk.api.response.OapiAttendanceListResponse;
+import com.dingtalk.api.response.OapiMessageCorpconversationAsyncsendV2Response;
+import com.dingtalk.api.response.OapiProcessinstanceGetResponse;
+import com.dingtalk.api.response.OapiProcessinstanceListidsResponse;
+import com.dingtalk.api.response.OapiUserGetResponse;
 import com.lcsc.ding.core.constant.Constant;
 import com.taobao.api.ApiException;
 import org.apache.commons.collections.MapUtils;
@@ -22,7 +25,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DingUtil {
@@ -202,7 +209,6 @@ public class DingUtil {
      */
     public static OapiProcessinstanceGetResponse.ProcessInstanceTopVo getProcessById(String processId) {
 
-        System.out.println(processId);
 
         DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/processinstance/get");
         OapiProcessinstanceGetRequest request = new OapiProcessinstanceGetRequest();
@@ -253,7 +259,7 @@ public class DingUtil {
 
         // 当月最后一天
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
-        getProcessByCodeAndId(Constant.LEAVE_PROCESS_CODE,"manager4081",dateTime.toDate(),lastDay.toDate() );
+        getProcessByCodeAndId(Constant.LEAVE_PROCESS_CODE, "manager4081", dateTime.toDate(), lastDay.toDate());
         //  getProcessById("45285f52-a5a3-4bc9-9829-e82697cf47b0");
     }
 

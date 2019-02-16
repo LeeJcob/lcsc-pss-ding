@@ -1,7 +1,6 @@
 package com.lcsc.ding.controller;
 
 import com.lcsc.ding.core.model.NoSignModel;
-import com.lcsc.ding.core.model.SubsidyModel;
 import com.lcsc.ding.core.util.ServiceResult;
 import com.lcsc.ding.service.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +37,9 @@ public class StatisticsController {
      * @return
      */
     @GetMapping("/nosign/list")
-    public ServiceResult<List<NoSignModel>> getNoSignList(String userid,Integer year, Integer month) {
+    public ServiceResult<List<NoSignModel>> getNoSignList(String userid, Integer year, Integer month) {
 
-        return this.statisticsService.getNoSignList(userid,year, month);
+        return this.statisticsService.getNoSignList(userid, year, month);
     }
 
 
@@ -52,9 +51,9 @@ public class StatisticsController {
      * @return
      */
     @GetMapping("/subsidy/list")
-    public ServiceResult<Map<String, Object>> getSubsidyList(String userid,Integer year, Integer month) {
+    public ServiceResult<Map<String, Object>> getSubsidyList(String userid, Integer year, Integer month) {
 
-        return this.statisticsService.getSubsidyList(userid,year, month);
+        return this.statisticsService.getSubsidyList(userid, year, month);
     }
 
 

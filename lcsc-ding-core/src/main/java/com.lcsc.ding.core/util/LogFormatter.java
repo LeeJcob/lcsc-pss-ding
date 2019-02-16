@@ -57,7 +57,7 @@ public class LogFormatter {
 
         private String value;
 
-        private LogEvent(String value){
+        private LogEvent(String value) {
             this.value = value;
         }
 
@@ -79,7 +79,7 @@ public class LogFormatter {
             return String.valueOf(value);
         }
 
-        private KeyValue(String key, Object value){
+        private KeyValue(String key, Object value) {
             super();
             this.key = key;
             this.value = value;

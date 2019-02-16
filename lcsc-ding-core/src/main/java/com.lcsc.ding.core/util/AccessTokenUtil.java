@@ -1,9 +1,9 @@
 package com.lcsc.ding.core.util;
 
-import com.lcsc.ding.core.constant.Constant;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.request.OapiGettokenRequest;
 import com.dingtalk.api.response.OapiGettokenResponse;
+import com.lcsc.ding.core.constant.Constant;
 import com.taobao.api.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

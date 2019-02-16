@@ -1,7 +1,6 @@
 package com.lcsc.ding.core.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 迟到详情

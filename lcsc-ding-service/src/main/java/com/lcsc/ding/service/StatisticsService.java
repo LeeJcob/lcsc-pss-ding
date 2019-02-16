@@ -13,12 +13,13 @@ public interface StatisticsService {
 
     /**
      * 查询一个月内除去迟到免扣款后的迟到次数及时长
+     *
      * @param userid
      * @param year
      * @param month
      * @return
      */
-    ServiceResult<Map<String, Object>> getLateList(String userid,Integer year, Integer month);
+    ServiceResult<Map<String, Object>> getLateList(String userid, Integer year, Integer month);
 
 
     /**

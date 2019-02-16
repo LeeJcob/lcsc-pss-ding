@@ -3,10 +3,11 @@ package com.lcsc.ding.core.util;
 import java.io.Serializable;
 
 /**
- *service层返回对象列表封装
+ * service层返回对象列表封装
+ *
  * @param <T>
  */
-public class ServiceResult<T>  implements Serializable{
+public class ServiceResult<T> implements Serializable {
 
     private boolean success = false;
 
