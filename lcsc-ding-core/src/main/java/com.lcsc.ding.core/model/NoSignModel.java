@@ -11,6 +11,8 @@ public class NoSignModel {
     //时间格式
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    private static SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
+
     /**
      * 日期
      */
@@ -32,7 +34,7 @@ public class NoSignModel {
 
     public void setNoSignDay(Date noSignDay) {
 
-        this.noSignDay = simpleDateFormat.format(noSignDay);
+        this.noSignDay = simpleDateFormat1.format(noSignDay);
     }
 
     public String getNoSignTime() {
