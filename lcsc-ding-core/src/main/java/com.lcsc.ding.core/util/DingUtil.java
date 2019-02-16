@@ -178,17 +178,16 @@ public class DingUtil {
 
             response = client.execute(req, AccessTokenUtil.getToken());
             // 解析申请单id
-            String jsonString = response.getBody();
-            JSONObject result = JSONObject.parseObject(jsonString);
-            Integer errcode = result.getInteger("errcode");
+            OapiProcessinstanceListidsResponse.PageResult pageResult = response.getResult();
+            Long errcode = response.getErrcode();
 
             if (0 != errcode) {
 
                 return null;
             }
-            JSONArray processIds = result.getJSONObject("result").getJSONArray("list");
+            List<String> processIds = pageResult.getList();
 
-            return Arrays.asList(processIds.toJSONString());
+            return processIds;
 
         } catch (ApiException e) {
 
@@ -202,6 +201,8 @@ public class DingUtil {
      * 根据申请id获取申请详情
      */
     public static OapiProcessinstanceGetResponse.ProcessInstanceTopVo getProcessById(String processId) {
+
+        System.out.println(processId);
 
         DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/processinstance/get");
         OapiProcessinstanceGetRequest request = new OapiProcessinstanceGetRequest();

@@ -23,7 +23,7 @@ public class Constant {
     public static final String LEAVE_PROCESS_CODE = "PROC-F18CD967-8E97-4D1E-A08E-C744DF73DA8E";
 
     //车费报销审批  TODO
-    public static final String SUBSIDY_PROCESS_CODE = "PROC-F18CD967-8E97-4D1E-A08E-C744DF73DA8E";
+    public static final String SUBSIDY_PROCESS_CODE = "PROC-RFYJYKDV-8303FQBP1AL3EAU76DMU3-VS1RT6SJ-Q";
 
     // 补卡审批
     public static final String LACK_CARD_PROCESS_CODE = "PROC-F18CD967-8E97-4D1E-A08E-C744DF73DA8E";
@@ -87,6 +87,11 @@ public class Constant {
      * 审批同意
      */
     public static final String PROCESS_RESULT_AGREE = "agree";
+
+    /**
+     * 审批完成
+     */
+    public static final String PROCESS_RESULT_COMPLETED = "COMPLETED";
 
     /**
      * 审批拒绝

@@ -11,15 +11,19 @@ import com.lcsc.ding.core.util.HolidayUtil;
 import com.lcsc.ding.core.util.ServiceResult;
 import com.lcsc.ding.service.StatisticsService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 统计相关接口实现
@@ -88,7 +92,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         // 如果当前时间还小于最后天，那lastDay为当前时间
         DateTime nowTime = new DateTime();
-        if(lastDay.isAfter(nowTime)){
+        if (lastDay.isAfter(nowTime)) {
 
             lastDay = nowTime;
         }
@@ -114,7 +118,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             for (OapiAttendanceListResponse.Recordresult recordResult : recordresultList) {
 
                 // 不是工作日就过滤掉
-                if(!holidayUtil.isWorkDay(recordResult.getWorkDate())){
+                if (!holidayUtil.isWorkDay(recordResult.getWorkDate())) {
 
                     continue;
                 }
@@ -129,7 +133,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                     noSignModelList.add(noSignModel);
 
-                }else if("APPROVE".equals(recordResult.getSourceType())){
+                } else if ("APPROVE".equals(recordResult.getSourceType())) {
 
                     NoSignModel noSignModel = new NoSignModel();
                     noSignModel.setNoSignDay(recordResult.getWorkDate());
@@ -146,12 +150,14 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public ServiceResult<List<SubsidyModel>> getSubsidyList(Integer year, Integer month) {
+    public ServiceResult<Map<String, Object>> getSubsidyList(String userId, Integer year, Integer month) {
         // 获取当前用户  TODO
-        String userId = "manager4081";
+
+        Map<String, Object> result = new HashMap<>();
+        // String userId = "manager4081";
         List<SubsidyModel> subsidyModels = new ArrayList<>();
         // 获取用户所有的报销申请
-        DateTime dateTime = new DateTime(2018, 12, 1, 0, 0);
+        DateTime dateTime = new DateTime(year, month, 1, 0, 0);
 
         // 当月最后一天
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
@@ -161,18 +167,43 @@ public class StatisticsServiceImpl implements StatisticsService {
 
             // 查询对应的审批
             OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(process);
-            if (Constant.PROCESS_RESULT_AGREE.equals(processInstanceTopVo.getResult())) {
+
+            if (processInstanceTopVo != null) {
+
 
                 SubsidyModel subsidyModel = new SubsidyModel();
                 //  审批是否通过    金额   日期  等
+                List<OapiProcessinstanceGetResponse.FormComponentValueVo> formComponentValues = processInstanceTopVo.getFormComponentValues();
+                OapiProcessinstanceGetResponse.FormComponentValueVo money = formComponentValues.get(0);
+                OapiProcessinstanceGetResponse.FormComponentValueVo date = formComponentValues.get(1);
+                subsidyModel.setMoney(new BigDecimal(money.getValue()));
+                subsidyModel.setProcessDay(date.getValue());
 
+                subsidyModel.setAgree(Boolean.FALSE);
+
+                if (Constant.PROCESS_RESULT_AGREE.equals(processInstanceTopVo.getResult()) && Constant.PROCESS_RESULT_COMPLETED.equals(processInstanceTopVo.getStatus())) {
+
+                    subsidyModel.setAgree(Boolean.TRUE);
+                }
 
                 subsidyModels.add(subsidyModel);
             }
+
         }
 
+        BigDecimal totalMoney = BigDecimal.ZERO;
 
-        return ServiceResult.success(subsidyModels);
+        for (SubsidyModel subsidyModel : subsidyModels) {
+
+            if (subsidyModel.getAgree()) {
+
+                totalMoney = totalMoney.add(subsidyModel.getMoney());
+            }
+
+        }
+        result.put("totalMoney", totalMoney);
+        result.put("subsidys", subsidyModels);
+        return ServiceResult.success(result);
     }
 
 

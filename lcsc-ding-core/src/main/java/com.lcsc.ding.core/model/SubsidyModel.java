@@ -11,7 +11,7 @@ public class SubsidyModel {
     /**
      * 日期
      */
-    private Date processDay;
+    private String processDay;
 
     /**
      * 金额
@@ -23,11 +23,11 @@ public class SubsidyModel {
      */
     private Boolean isAgree;
 
-    public Date getProcessDay() {
+    public String getProcessDay() {
         return processDay;
     }
 
-    public void setProcessDay(Date processDay) {
+    public void setProcessDay(String processDay) {
         this.processDay = processDay;
     }
 

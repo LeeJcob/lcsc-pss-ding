@@ -52,9 +52,9 @@ public class StatisticsController {
      * @return
      */
     @GetMapping("/subsidy/list")
-    public ServiceResult<List<SubsidyModel>> getSubsidyList(Integer year, Integer month) {
+    public ServiceResult<Map<String, Object>> getSubsidyList(String userid,Integer year, Integer month) {
 
-        return this.statisticsService.getSubsidyList(year, month);
+        return this.statisticsService.getSubsidyList(userid,year, month);
     }
 
 

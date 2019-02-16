@@ -1,7 +1,6 @@
 package com.lcsc.ding.service;
 
 import com.lcsc.ding.core.model.NoSignModel;
-import com.lcsc.ding.core.model.SubsidyModel;
 import com.lcsc.ding.core.util.ServiceResult;
 
 import java.util.List;
@@ -33,9 +32,11 @@ public interface StatisticsService {
 
     /**
      * 查询一个月的交通补贴
+     *
+     * @param userid
      * @param year
      * @param month
      * @return
      */
-    ServiceResult<List<SubsidyModel>> getSubsidyList(Integer year, Integer month);
+    ServiceResult<Map<String, Object>> getSubsidyList(String userid, Integer year, Integer month);
 }
