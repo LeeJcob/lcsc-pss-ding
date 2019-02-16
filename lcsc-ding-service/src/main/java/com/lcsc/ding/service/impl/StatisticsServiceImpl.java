@@ -55,6 +55,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
             response = DingUtil.getAttendanceByUserId(dateTime.toDate(), endDay.toDate(), userId);
 
+            dateTime = endDay.plusDays(1);
             if (null == response) {
 
                 continue;
@@ -63,7 +64,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             //根据考勤结果  解析异常考勤
             lateModels.addAll(judge(response));
 
-            dateTime = endDay.plusDays(1);
+
         }
 
         Integer totalMinutes = 0;
@@ -91,11 +92,11 @@ public class StatisticsServiceImpl implements StatisticsService {
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
 
         // 如果当前时间还小于最后天，那lastDay为当前时间
-        DateTime nowTime = new DateTime();
+       /* DateTime nowTime = new DateTime();
         if (lastDay.isAfter(nowTime)) {
 
             lastDay = nowTime;
-        }
+        }*/
 
         DateTime endDay = null;
 
@@ -111,6 +112,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             //根据考勤结果  解析漏打卡的
             List<OapiAttendanceListResponse.Recordresult> recordresultList = response.getRecordresult();
 
+            dateTime = endDay.plusDays(1);
             if (CollectionUtils.isEmpty(recordresultList)) {
                 continue;
             }
@@ -144,7 +146,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 }
             }
 
-            dateTime = endDay.plusDays(1);
+
         }
         return ServiceResult.success(noSignModelList);
     }
