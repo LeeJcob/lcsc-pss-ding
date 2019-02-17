@@ -92,20 +92,22 @@ public class StatisticsServiceImpl implements StatisticsService {
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
 
         // 如果当前时间还小于最后天，那lastDay为当前时间
-       /* DateTime nowTime = new DateTime();
+        DateTime nowTime = new DateTime();
         if (lastDay.isAfter(nowTime)) {
 
             lastDay = nowTime;
-        }*/
+        }
 
-        DateTime endDay = null;
+        DateTime endDay = dateTime.plusDays(6);
+
+        endDay = endDay.isAfter(lastDay) ? lastDay : endDay;
 
         // 考勤结果
         OapiAttendanceListResponse response = null;
 
         List<NoSignModel> noSignModelList = new ArrayList<>();
 
-        while (lastDay.isAfter(endDay = getLastDayOfWeek(dateTime)) || lastDay.isEqual(endDay)) {
+        while (lastDay.isAfter(endDay) || lastDay.isEqual(endDay)) {
 
             response = DingUtil.getAttendanceByUserId(dateTime.toDate(), endDay.toDate(), userId);
 
@@ -113,6 +115,16 @@ public class StatisticsServiceImpl implements StatisticsService {
             List<OapiAttendanceListResponse.Recordresult> recordresultList = response.getRecordresult();
 
             dateTime = endDay.plusDays(1);
+
+            if(!endDay.isEqual(lastDay)){
+
+                endDay = dateTime.plusDays(6);
+                endDay = endDay.isAfter(lastDay) ? lastDay : endDay;
+            }else{
+
+                endDay = dateTime.plusDays(6);
+            }
+
             if (CollectionUtils.isEmpty(recordresultList)) {
                 continue;
             }
@@ -145,8 +157,6 @@ public class StatisticsServiceImpl implements StatisticsService {
                     noSignModelList.add(noSignModel);
                 }
             }
-
-
         }
         return ServiceResult.success(noSignModelList);
     }
