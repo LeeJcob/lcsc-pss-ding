@@ -140,7 +140,7 @@ public class DayWarningTimer {
 
                             if (simpleDateFormat.parse(simpleDateFormat.format(userCheckTime)).after(simpleDateFormat.parse(offTime))) {
 
-                                DingUtil.push(userId, "您昨晚辛苦加班到十点之后，若有打车，别忘了填报销单哦");
+                                DingUtil.push(userId, "您昨晚辛苦加班到十点之后，若有打车，别忘了填交通补贴单哦");
                             }
 
                         }
