@@ -1,10 +1,12 @@
 package com.lcsc.ding.job;
 
 import com.dingtalk.api.response.OapiAttendanceListResponse;
+import com.dingtalk.api.response.OapiProcessinstanceGetResponse;
 import com.lcsc.ding.core.constant.Constant;
 import com.lcsc.ding.core.util.DingUtil;
 import com.lcsc.ding.core.util.HolidayUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -105,16 +107,23 @@ public class DayWarningTimer {
     }
 
 
-    @Scheduled(cron = "0 35 9 * * *")
+    @Scheduled(cron = "0 25 9 * * *")
     public void sumbitSubsidyTimer() {
 
         try {
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
 
+            SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+            String onTime = "09:00:00";
+
             String offTime = "22:00:00";
 
             Date userCheckTime = null;
+
+
+            Date today = new DateTime().toDate();
 
             //前一天
             Date yesterday = new DateTime().minusDays(1).toDate();
@@ -128,24 +137,89 @@ public class DayWarningTimer {
 
                 for (String userId : userIdList) {
 
-                    OapiAttendanceListResponse attendance = DingUtil.getAttendanceByUserId(yesterday, yesterday, userId);
-                    List<OapiAttendanceListResponse.Recordresult> recordresult = attendance.getRecordresult();
+                    // 是否有提交交通补贴
+                    Boolean subsidyFlag = false;
 
-                    for (OapiAttendanceListResponse.Recordresult recordresult1 : recordresult) {
+                    // 是否有免扣款
+                    Boolean deductFlag = false;
+
+                    OapiAttendanceListResponse yesterdayAttendance = DingUtil.getAttendanceByUserId(yesterday, yesterday, userId);
+
+                    List<OapiAttendanceListResponse.Recordresult> yesterdayRecordresult = yesterdayAttendance.getRecordresult();
+
+                    for (OapiAttendanceListResponse.Recordresult recordresult1 : yesterdayRecordresult) {
 
 
                         if (Constant.CHECKTYPE_OFFDUTY.equals(recordresult1.getCheckType()) && Constant.TIMERESULT_NORMAL.equals(recordresult1.getTimeResult())) {
 
                             userCheckTime = recordresult1.getUserCheckTime();
 
+                            // 是否在十点钟之后
                             if (simpleDateFormat.parse(simpleDateFormat.format(userCheckTime)).after(simpleDateFormat.parse(offTime))) {
 
-                                DingUtil.push(userId, "您昨晚辛苦加班到十点之后，若有打车，别忘了填交通补贴单哦");
+                                //今天是否迟到并且没有提交迟到免扣款
+                                OapiAttendanceListResponse todayAttendance = DingUtil.getAttendanceByUserId(today, today, userId);
+
+                                List<OapiAttendanceListResponse.Recordresult> todayRecordresult = todayAttendance.getRecordresult();
+
+                                if (CollectionUtils.isNotEmpty(todayRecordresult)) {
+
+                                    OapiAttendanceListResponse.Recordresult recordresult = todayRecordresult.get(0);
+
+                                    if (simpleDateFormat.parse(simpleDateFormat.format(recordresult.getUserCheckTime())).after(simpleDateFormat.parse(onTime))
+                                            && StringUtils.isBlank(recordresult.getProcInstId())) {
+
+                                        deductFlag = true;
+                                    }
+
+                                }
+
+
+                                // 判断是否有提交交通补贴
+                                List<String> processIds = DingUtil.getProcessByCodeAndId(Constant.SUBSIDY_PROCESS_CODE, userId, yesterday, today);
+
+
+                                for (String process : processIds) {
+                                    // 查询对应的审批
+                                    OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(process);
+
+                                    if (processInstanceTopVo != null) {
+
+                                        List<OapiProcessinstanceGetResponse.FormComponentValueVo> formComponentValues = processInstanceTopVo.getFormComponentValues();
+
+                                        //加班时间  yyyy-MM-dd HH:mm
+                                        OapiProcessinstanceGetResponse.FormComponentValueVo date = formComponentValues.get(1);
+                                        String dateString = date.getValue();
+
+                                        //在下班之后有交通补贴审批 则已经提交了
+                                        if (simpleDateFormat1.parse(dateString).after(userCheckTime)) {
+
+
+                                            subsidyFlag = true;
+                                        }
+
+
+                                    }
+
+                                }
+
+
                             }
 
                         }
 
                     }
+
+                    if (!subsidyFlag) {
+
+                        DingUtil.push(userId, "您昨晚辛苦加班到十点之后，若有打车，别忘了填交通补贴单哦!");
+                    }
+
+                    if (deductFlag) {
+
+                        DingUtil.push(userId, "您今天迟到了，别忘了提交迟到免扣款哦!");
+                    }
+
                 }
 
             }
