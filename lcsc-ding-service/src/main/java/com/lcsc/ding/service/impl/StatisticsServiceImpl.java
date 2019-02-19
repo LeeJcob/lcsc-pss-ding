@@ -194,6 +194,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             }
 
             if (CollectionUtils.isEmpty(recordresultList)) {
+
                 continue;
             }
             // 循环打卡记录
@@ -210,10 +211,10 @@ public class StatisticsServiceImpl implements StatisticsService {
                 // 如果有打卡记录，且时间结果不是未打卡
                 if ("NotSigned".equals(recordResult.getTimeResult())) {
 
+
                     NoSignModel noSignModel = new NoSignModel();
                     noSignModel.setNoSignDay(recordResult.getWorkDate());
                     noSignModel.setNoSignTime(recordResult.getBaseCheckTime());
-
 
                     // 请假的code
                     if (StringUtils.isNotEmpty(recordResult.getProcInstId())) {
@@ -223,9 +224,9 @@ public class StatisticsServiceImpl implements StatisticsService {
                     } else {
 
                         // 判断是否有提交漏打卡
-                        List<String> lateProIds = DingUtil.getProcessByCodeAndId(Constant.LACK_CARD_PROCESS_CODE, userId, recordResult.getWorkDate(), new Date());
+                        List<String> noSignProIds = DingUtil.getProcessByCodeAndId(Constant.LACK_CARD_PROCESS_CODE, userId, recordResult.getWorkDate(), new Date());
 
-                        for (String proId : lateProIds) {
+                        for (String proId : noSignProIds) {
 
                             OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(proId);
 
