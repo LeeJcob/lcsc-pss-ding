@@ -5,10 +5,12 @@ import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiAttendanceListRequest;
 import com.dingtalk.api.request.OapiMessageCorpconversationAsyncsendV2Request;
+import com.dingtalk.api.request.OapiProcessListbyuseridRequest;
 import com.dingtalk.api.request.OapiProcessinstanceGetRequest;
 import com.dingtalk.api.request.OapiProcessinstanceListidsRequest;
 import com.dingtalk.api.response.OapiAttendanceListResponse;
 import com.dingtalk.api.response.OapiMessageCorpconversationAsyncsendV2Response;
+import com.dingtalk.api.response.OapiProcessListbyuseridResponse;
 import com.dingtalk.api.response.OapiProcessinstanceGetResponse;
 import com.dingtalk.api.response.OapiProcessinstanceListidsResponse;
 import com.dingtalk.api.response.OapiUserGetResponse;
@@ -259,8 +261,23 @@ public class DingUtil {
 
         // 当月最后一天
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
-        getProcessByCodeAndId(Constant.LEAVE_PROCESS_CODE, "manager4081", dateTime.toDate(), lastDay.toDate());
+       // getProcessByCodeAndId(Constant.LEAVE_PROCESS_CODE, "manager4081", dateTime.toDate(), lastDay.toDate());
         //  getProcessById("45285f52-a5a3-4bc9-9829-e82697cf47b0");
+
+        getProcessListByUserId();
     }
 
+    public static void getProcessListByUserId() {
+        DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/process/listbyuserid");
+        OapiProcessListbyuseridRequest request = new OapiProcessListbyuseridRequest();
+        request.setUserid("182458280126054575");
+        request.setOffset(0L);
+        request.setSize(100L);
+        try {
+            OapiProcessListbyuseridResponse response = client.execute(request, AccessTokenUtil.getToken());
+            System.out.println(response);
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
+    }
 }
