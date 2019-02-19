@@ -18,6 +18,7 @@ import org.joda.time.PeriodType;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -118,7 +119,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                     List<String> lateProIds = DingUtil.getProcessByCodeAndId(Constant.LATE_PROCESS_CODE, userId, recordresult.getWorkDate(), new DateTime(recordresult.getWorkDate()).plusDays(1).toDate());
 
-                    if(CollectionUtils.isNotEmpty(lateProIds)){
+                    if (CollectionUtils.isNotEmpty(lateProIds)) {
 
                         lateModel.setHasProcess(Boolean.TRUE);
                     }
@@ -153,6 +154,10 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         // 当月最后一天
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
 
         // 如果当前时间还小于最后天，那lastDay为当前时间
         DateTime nowTime = new DateTime();
@@ -200,6 +205,8 @@ public class StatisticsServiceImpl implements StatisticsService {
                     continue;
                 }
 
+                Boolean flag = Boolean.FALSE;
+
                 // 如果有打卡记录，且时间结果不是未打卡
                 if ("NotSigned".equals(recordResult.getTimeResult())) {
 
@@ -207,14 +214,43 @@ public class StatisticsServiceImpl implements StatisticsService {
                     noSignModel.setNoSignDay(recordResult.getWorkDate());
                     noSignModel.setNoSignTime(recordResult.getBaseCheckTime());
 
+
+                    // 请假的code
                     if (StringUtils.isNotEmpty(recordResult.getProcInstId())) {
 
-                        noSignModel.setHasProcess(true);
+                        flag = true;
+
                     } else {
 
-                        noSignModel.setHasProcess(false);
-                    }
+                        // 判断是否有提交漏打卡
+                        List<String> lateProIds = DingUtil.getProcessByCodeAndId(Constant.LACK_CARD_PROCESS_CODE, userId, recordResult.getWorkDate(), new Date());
 
+                        for (String proId : lateProIds) {
+
+                            OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(proId);
+
+                            if (processInstanceTopVo != null) {
+
+                                List<OapiProcessinstanceGetResponse.FormComponentValueVo> formComponentValues = processInstanceTopVo.getFormComponentValues();
+                                OapiProcessinstanceGetResponse.FormComponentValueVo date = formComponentValues.get(0);
+                                try {
+                                    //该审批是当天的  并且排除一天两次漏打卡的情况
+                                    if (simpleDateFormat1.parse(date.getValue()).compareTo(recordResult.getWorkDate()) == 0 &&
+                                            !simpleDateFormat.parse(date.getValue()).before(recordResult.getBaseCheckTime())) {
+
+                                        flag = true;
+                                        break;
+                                    }
+                                } catch (ParseException e) {
+
+                                    e.printStackTrace();
+                                }
+
+
+                            }
+                        }
+                    }
+                    noSignModel.setHasProcess(flag);
 
                     noSignModelList.add(noSignModel);
 
