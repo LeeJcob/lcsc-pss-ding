@@ -13,8 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +59,7 @@ public class DayWarningTimer {
 
         try {
 
+
             boolean workDay = new HolidayUtil().isWorkDay(null);
 
             // 是工作日就开始核查打卡信息
@@ -70,31 +69,27 @@ public class DayWarningTimer {
 
                 Date now = new Date();
 
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(now);
-                calendar.set(Calendar.HOUR_OF_DAY, 18);
-
                 for (String userId : userIdList) {
 
                     OapiAttendanceListResponse attendance = DingUtil.getAttendanceByUserId(now, now, userId);
                     List<OapiAttendanceListResponse.Recordresult> recordresult = attendance.getRecordresult();
 
-                    if (CollectionUtils.isEmpty(recordresult)) {
+                    Boolean offDuty = false;
 
-                        recordresult = new ArrayList<>();
-                    }
+                    if (CollectionUtils.isNotEmpty(recordresult)) {
 
-                    boolean isException = true;
+                        for (OapiAttendanceListResponse.Recordresult record : recordresult) {
 
-                    for (OapiAttendanceListResponse.Recordresult record : recordresult) {
+                            if (Constant.CHECKTYPE_OFFDUTY.equals(record.getCheckType()) && Constant.TIMERESULT_NORMAL.equals(record.getTimeResult())) {
 
-                        if (record.getUserCheckTime().after(calendar.getTime())) {
+                                offDuty = true;
 
-                            isException = false;
+                                break;
+                            }
                         }
                     }
 
-                    if (isException) {
+                    if (!offDuty) {
 
                         DingUtil.push(userId, "尊敬的用户你好，今日你忘记打下班卡了哦，请及时补卡");
                     }

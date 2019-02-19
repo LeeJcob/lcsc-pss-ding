@@ -262,9 +262,9 @@ public class DingUtil {
         // 当月最后一天
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
        // getProcessByCodeAndId(Constant.LEAVE_PROCESS_CODE, "manager4081", dateTime.toDate(), lastDay.toDate());
-        //  getProcessById("45285f52-a5a3-4bc9-9829-e82697cf47b0");
+          getProcessById("6b2945f8-6651-4d8d-b385-79f4411473e9");
 
-        getProcessListByUserId();
+       // getProcessListByUserId();
     }
 
     public static void getProcessListByUserId() {
