@@ -80,7 +80,8 @@ public class DayWarningTimer {
 
                         for (OapiAttendanceListResponse.Recordresult record : recordresult) {
 
-                            if (Constant.CHECKTYPE_OFFDUTY.equals(record.getCheckType()) && Constant.TIMERESULT_NORMAL.equals(record.getTimeResult())) {
+                            if (Constant.CHECKTYPE_OFFDUTY.equals(record.getCheckType()) && Constant.TIMERESULT_NORMAL.equals(record.getTimeResult())
+                                    && StringUtils.isBlank(record.getProcInstId())) {
 
                                 offDuty = true;
 

@@ -37,33 +37,96 @@ public class StatisticsServiceImpl implements StatisticsService {
     public ServiceResult<Map<String, Object>> getLateList(String userId, Integer year, Integer month) {
 
         Map<String, Object> result = new HashMap<>();
-        // 获取当前用户  TODO
-        // String userId = "manager4081";
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // 当月第一天
         DateTime dateTime = new DateTime(year, month, 1, 0, 0);
-
         // 当月最后一天
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
-
         DateTime endDay = null;
+
         List<LateModel> lateModels = new ArrayList<>();
         // 考勤结果
         OapiAttendanceListResponse response = null;
+
+        String timeResult = "";
+
+        // 考勤设置  九点上班
+        Date baseCheckTime = null;
+
+        // 打卡时间
+        Date userCheckTime = null;
+
 
         while (lastDay.isAfter(endDay = getLastDayOfWeek(dateTime)) || lastDay.isEqual(endDay)) {
 
             response = DingUtil.getAttendanceByUserId(dateTime.toDate(), endDay.toDate(), userId);
 
             dateTime = endDay.plusDays(1);
+
             if (null == response) {
 
                 continue;
             }
 
             //根据考勤结果  解析异常考勤
-            lateModels.addAll(judge(response));
+            List<OapiAttendanceListResponse.Recordresult> recordresultList = response.getRecordresult();
 
+            if (CollectionUtils.isEmpty(recordresultList)) {
+
+                continue;
+            }
+
+
+            for (OapiAttendanceListResponse.Recordresult recordresult : recordresultList) {
+
+                if (Constant.CHECKTYPE_OFFDUTY.equals(recordresult.getCheckType())) {
+
+                    continue;
+                }
+
+                baseCheckTime = recordresult.getBaseCheckTime();
+                DateTime baseCheckDate = new DateTime(baseCheckTime);
+
+                timeResult = recordresult.getTimeResult();
+
+                if (Constant.TIMERESULT_LATE.equals(timeResult) || Constant.TIMERESULT_SERIOUSLATE.equals(timeResult) || Constant.TIMERESULT_ABSENTEEISM.equals(timeResult)) {
+                    LateModel lateModel = new LateModel();
+
+                    lateModel.setLateDay(sdf.format(recordresult.getWorkDate()));
+
+
+                    lateModel.setHasProcess(Boolean.FALSE);
+                    userCheckTime = recordresult.getUserCheckTime();
+                    lateModel.setSignTime(sdf.format(userCheckTime));
+                    DateTime user = new DateTime(userCheckTime);
+                    Period p = new Period(baseCheckDate, user, PeriodType.minutes());
+
+                    lateModel.setLateMinutes(p.getMinutes());
+                    // 迟到有相关的审批
+                    if (StringUtils.isNotEmpty(recordresult.getProcInstId())) {
+
+                        OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(recordresult.getProcInstId());
+
+                        if (Constant.PROCESS_RESULT_AGREE.equals(processInstanceTopVo.getResult())) {
+
+                            //  审批是否通过
+                            lateModel.setHasProcess(Boolean.TRUE);
+                        }
+
+                    }
+
+                    List<String> lateProIds = DingUtil.getProcessByCodeAndId(Constant.LATE_PROCESS_CODE, userId, recordresult.getWorkDate(), new DateTime(recordresult.getWorkDate()).plusDays(1).toDate());
+
+                    if(CollectionUtils.isNotEmpty(lateProIds)){
+
+                        lateModel.setHasProcess(Boolean.TRUE);
+                    }
+
+                    lateModels.add(lateModel);
+                }
+
+            }
 
         }
 
@@ -171,10 +234,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public ServiceResult<Map<String, Object>> getSubsidyList(String userId, Integer year, Integer month) {
-        // 获取当前用户  TODO
 
         Map<String, Object> result = new HashMap<>();
-        // String userId = "manager4081";
         List<SubsidyModel> subsidyModels = new ArrayList<>();
         // 获取用户所有的报销申请
         DateTime dateTime = new DateTime(year, month, 1, 0, 0);
@@ -224,74 +285,6 @@ public class StatisticsServiceImpl implements StatisticsService {
         result.put("totalMoney", totalMoney);
         result.put("subsidys", subsidyModels);
         return ServiceResult.success(result);
-    }
-
-
-    public static List<LateModel> judge(OapiAttendanceListResponse response) {
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        List<LateModel> lateModels = new ArrayList<>();
-        List<OapiAttendanceListResponse.Recordresult> recordresultList = response.getRecordresult();
-
-        if (CollectionUtils.isEmpty(recordresultList)) {
-
-            return lateModels;
-        }
-
-        String timeResult = "";
-
-        // 考勤设置  九点上班
-        Date baseCheckTime = null;
-
-        // 打卡时间
-        Date userCheckTime = null;
-
-        Integer lateMinutes = 0;
-        for (OapiAttendanceListResponse.Recordresult recordresult : recordresultList) {
-
-            if (Constant.CHECKTYPE_OFFDUTY.equals(recordresult.getCheckType())) {
-
-                continue;
-            }
-
-            baseCheckTime = recordresult.getBaseCheckTime();
-            DateTime baseCheckDate = new DateTime(baseCheckTime);
-
-            timeResult = recordresult.getTimeResult();
-
-            if (Constant.TIMERESULT_LATE.equals(timeResult) || Constant.TIMERESULT_SERIOUSLATE.equals(timeResult) || Constant.TIMERESULT_ABSENTEEISM.equals(timeResult)) {
-                LateModel lateModel = new LateModel();
-
-                lateModel.setLateDay(sdf.format(recordresult.getWorkDate()));
-
-
-                lateModel.setHasProcess(Boolean.FALSE);
-                userCheckTime = recordresult.getUserCheckTime();
-                lateModel.setSignTime(sdf.format(userCheckTime));
-                DateTime user = new DateTime(userCheckTime);
-                Period p = new Period(baseCheckDate, user, PeriodType.minutes());
-
-                //  lateMinutes = lateMinutes + p.getMinutes();
-
-                lateModel.setLateMinutes(p.getMinutes());
-                // 迟到有相关的审批
-                if (StringUtils.isNotEmpty(recordresult.getProcInstId())) {
-
-                    OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(recordresult.getProcInstId());
-
-                    if (Constant.PROCESS_RESULT_AGREE.equals(processInstanceTopVo.getResult())) {
-
-                        //  审批是否通过
-                        lateModel.setHasProcess(Boolean.TRUE);
-                    }
-
-                }
-
-                lateModels.add(lateModel);
-            }
-
-        }
-        return lateModels;
     }
 
 
