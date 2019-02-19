@@ -13,11 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @SpringBootApplication
 @EnableScheduling
@@ -128,10 +124,12 @@ public class DayWarningTimer {
             //前一天
             Date yesterday = new DateTime().minusDays(1).toDate();
 
-            boolean workDay = new HolidayUtil().isWorkDay(yesterday);
+            Boolean yesterdayIsWork = new HolidayUtil().isWorkDay(yesterday);
+
+            Boolean todayIsWork = new HolidayUtil().isWorkDay(today);
 
             // 是工作日就开始核查打卡信息
-            if (workDay) {
+            if (yesterdayIsWork) {
 
                 Set<String> userIdList = DingUtil.getUserIdList();
 
@@ -140,8 +138,10 @@ public class DayWarningTimer {
                     // 是否有提交交通补贴
                     Boolean subsidyFlag = false;
 
+
                     // 是否有免扣款
                     Boolean deductFlag = false;
+
 
                     OapiAttendanceListResponse yesterdayAttendance = DingUtil.getAttendanceByUserId(yesterday, yesterday, userId);
 
@@ -157,23 +157,24 @@ public class DayWarningTimer {
                             // 是否在十点钟之后
                             if (simpleDateFormat.parse(simpleDateFormat.format(userCheckTime)).after(simpleDateFormat.parse(offTime))) {
 
-                                //今天是否迟到并且没有提交迟到免扣款
-                                OapiAttendanceListResponse todayAttendance = DingUtil.getAttendanceByUserId(today, today, userId);
+                                if (todayIsWork) {
+                                    //今天是否迟到并且没有提交迟到免扣款
+                                    OapiAttendanceListResponse todayAttendance = DingUtil.getAttendanceByUserId(today, today, userId);
 
-                                List<OapiAttendanceListResponse.Recordresult> todayRecordresult = todayAttendance.getRecordresult();
+                                    List<OapiAttendanceListResponse.Recordresult> todayRecordresult = todayAttendance.getRecordresult();
 
-                                if (CollectionUtils.isNotEmpty(todayRecordresult)) {
+                                    if (CollectionUtils.isNotEmpty(todayRecordresult)) {
 
-                                    OapiAttendanceListResponse.Recordresult recordresult = todayRecordresult.get(0);
+                                        OapiAttendanceListResponse.Recordresult recordresult = todayRecordresult.get(0);
 
-                                    if (simpleDateFormat.parse(simpleDateFormat.format(recordresult.getUserCheckTime())).after(simpleDateFormat.parse(onTime))
-                                            && StringUtils.isBlank(recordresult.getProcInstId())) {
+                                        if (simpleDateFormat.parse(simpleDateFormat.format(recordresult.getUserCheckTime())).after(simpleDateFormat.parse(onTime))
+                                                && StringUtils.isBlank(recordresult.getProcInstId())) {
 
-                                        deductFlag = true;
+                                            deductFlag = true;
+                                        }
+
                                     }
-
                                 }
-
 
                                 // 判断是否有提交交通补贴
                                 List<String> processIds = DingUtil.getProcessByCodeAndId(Constant.SUBSIDY_PROCESS_CODE, userId, yesterday, today);
