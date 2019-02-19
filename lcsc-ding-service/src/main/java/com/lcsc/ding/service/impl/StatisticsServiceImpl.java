@@ -116,11 +116,11 @@ public class StatisticsServiceImpl implements StatisticsService {
 
             dateTime = endDay.plusDays(1);
 
-            if(!endDay.isEqual(lastDay)){
+            if (!endDay.isEqual(lastDay)) {
 
                 endDay = dateTime.plusDays(6);
                 endDay = endDay.isAfter(lastDay) ? lastDay : endDay;
-            }else{
+            } else {
 
                 endDay = dateTime.plusDays(6);
             }
@@ -143,7 +143,15 @@ public class StatisticsServiceImpl implements StatisticsService {
                     NoSignModel noSignModel = new NoSignModel();
                     noSignModel.setNoSignDay(recordResult.getWorkDate());
                     noSignModel.setNoSignTime(recordResult.getBaseCheckTime());
-                    noSignModel.setHasProcess(false);
+
+                    if (StringUtils.isNotEmpty(recordResult.getProcInstId())) {
+
+                        noSignModel.setHasProcess(true);
+                    } else {
+
+                        noSignModel.setHasProcess(false);
+                    }
+
 
                     noSignModelList.add(noSignModel);
 
