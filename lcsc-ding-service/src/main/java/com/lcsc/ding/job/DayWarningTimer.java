@@ -95,7 +95,7 @@ public class DayWarningTimer {
 
                     if (!offDuty) {
 
-                        DingUtil.push(userId, simpleDateFormat.format(now)+"尊敬的用户你好，今日你忘记打下班卡了哦，请及时补卡");
+                        DingUtil.push(userId, simpleDateFormat.format(now) + "尊敬的用户你好，今日你忘记打下班卡了哦，请及时补卡");
                     }
                 }
 
@@ -140,7 +140,7 @@ public class DayWarningTimer {
                 for (String userId : userIdList) {
 
                     // 是否有提交交通补贴
-                    Boolean subsidyFlag = false;
+                    Boolean subsidyFlag = true;
 
 
                     // 是否有免扣款
@@ -171,10 +171,18 @@ public class DayWarningTimer {
 
                                         OapiAttendanceListResponse.Recordresult recordresult = todayRecordresult.get(0);
 
-                                        if (simpleDateFormat.parse(simpleDateFormat.format(recordresult.getUserCheckTime())).after(simpleDateFormat.parse(onTime))
-                                                && StringUtils.isBlank(recordresult.getProcInstId())) {
+                                        // 今天迟到了  并且今天没有提交免扣款
+                                        if (simpleDateFormat.parse(simpleDateFormat.format(recordresult.getUserCheckTime())).after(simpleDateFormat.parse(onTime))) {
 
-                                            deductFlag = true;
+
+                                            //有没有迟到免扣的申请
+                                            List<String> processIds = DingUtil.getProcessByCodeAndId(Constant.LATE_PROCESS_CODE, userId, recordresult.getUserCheckTime(), today);
+
+                                            if (CollectionUtils.isEmpty(processIds)) {
+                                                //没有提交免扣款
+                                                deductFlag = true;
+                                            }
+
                                         }
 
                                     }
@@ -183,29 +191,35 @@ public class DayWarningTimer {
                                 // 判断是否有提交交通补贴
                                 List<String> processIds = DingUtil.getProcessByCodeAndId(Constant.SUBSIDY_PROCESS_CODE, userId, yesterday, today);
 
+                                if (CollectionUtils.isEmpty(processIds)) {
 
-                                for (String process : processIds) {
-                                    // 查询对应的审批
-                                    OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(process);
-
-                                    if (processInstanceTopVo != null) {
-
-                                        List<OapiProcessinstanceGetResponse.FormComponentValueVo> formComponentValues = processInstanceTopVo.getFormComponentValues();
-
-                                        //加班时间  yyyy-MM-dd HH:mm
-                                        OapiProcessinstanceGetResponse.FormComponentValueVo date = formComponentValues.get(1);
-                                        String dateString = date.getValue();
-
-                                        //在下班之后有交通补贴审批 则已经提交了
-                                        if (simpleDateFormat1.parse(dateString).after(userCheckTime)) {
+                                    subsidyFlag = false;
+                                } else {
 
 
-                                            subsidyFlag = true;
+                                    for (String process : processIds) {
+                                        // 查询对应的审批
+                                        OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(process);
+
+                                        if (processInstanceTopVo != null) {
+
+                                            List<OapiProcessinstanceGetResponse.FormComponentValueVo> formComponentValues = processInstanceTopVo.getFormComponentValues();
+
+                                            //加班时间  yyyy-MM-dd HH:mm
+                                            OapiProcessinstanceGetResponse.FormComponentValueVo date = formComponentValues.get(1);
+                                            String dateString = date.getValue();
+
+                                            //在下班之后有交通补贴审批 则已经提交了
+                                            if (simpleDateFormat1.parse(dateString).after(userCheckTime)) {
+
+                                                subsidyFlag = true;
+                                                break;
+                                            }
+
+
                                         }
 
-
                                     }
-
                                 }
 
 
