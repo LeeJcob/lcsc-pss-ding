@@ -22,6 +22,9 @@ import java.util.Set;
 @EnableScheduling
 public class DayWarningTimer {
 
+    //时间格式
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     @Scheduled(cron = "0 30 9 * * *")
     public void signInTimer() {
 
@@ -92,7 +95,7 @@ public class DayWarningTimer {
 
                     if (!offDuty) {
 
-                        DingUtil.push(userId, "尊敬的用户你好，今日你忘记打下班卡了哦，请及时补卡");
+                        DingUtil.push(userId, simpleDateFormat.format(now)+"尊敬的用户你好，今日你忘记打下班卡了哦，请及时补卡");
                     }
                 }
 
