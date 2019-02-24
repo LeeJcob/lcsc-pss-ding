@@ -23,7 +23,13 @@ import java.util.Set;
 public class DayWarningTimer {
 
     //时间格式
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+
+    SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+    SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyy-MM-dd");
+
+    SimpleDateFormat simpleDateFormat3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Scheduled(cron = "0 30 9 * * *")
     public void signInTimer() {
@@ -57,7 +63,7 @@ public class DayWarningTimer {
         }
     }
 
-    @Scheduled(cron = "0 30 18,20,22 * * *")
+    @Scheduled(cron = "0 15 18 * * *")
     public void signOutTimer() {
 
         try {
@@ -95,7 +101,7 @@ public class DayWarningTimer {
 
                     if (!offDuty) {
 
-                        DingUtil.push(userId, simpleDateFormat.format(now) + "尊敬的用户你好，今日你忘记打下班卡了哦，请及时补卡");
+                        DingUtil.push(userId, "尊敬的用户你好，今日你忘记打下班卡了哦，请及时补卡");
                     }
                 }
 
@@ -108,25 +114,26 @@ public class DayWarningTimer {
 
 
     @Scheduled(cron = "0 25 9 * * *")
+    // @Scheduled(cron = "*/5 * * * * ?")
     public void sumbitSubsidyTimer() {
 
         try {
 
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-
-            SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
             String onTime = "09:00:00";
+
 
             String offTime = "22:00:00";
 
             Date userCheckTime = null;
 
 
-            Date today = new DateTime().toDate();
+            Date today = new DateTime().minusDays(1).toDate();
 
             //前一天
-            Date yesterday = new DateTime().minusDays(1).toDate();
+            Date yesterday = new DateTime().minusDays(2).toDate();
+
+            Date checkTime = simpleDateFormat3.parse(simpleDateFormat2.format(yesterday) + " " + offTime);
 
             Boolean yesterdayIsWork = new HolidayUtil().isWorkDay(yesterday);
 
@@ -159,7 +166,7 @@ public class DayWarningTimer {
                             userCheckTime = recordresult1.getUserCheckTime();
 
                             // 是否在十点钟之后
-                            if (simpleDateFormat.parse(simpleDateFormat.format(userCheckTime)).after(simpleDateFormat.parse(offTime))) {
+                            if (userCheckTime.after(checkTime)) {
 
                                 if (todayIsWork) {
                                     //今天是否迟到并且没有提交迟到免扣款
