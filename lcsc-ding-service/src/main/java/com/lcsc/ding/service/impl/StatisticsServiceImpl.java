@@ -40,6 +40,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         Map<String, Object> result = new HashMap<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
         // 当月第一天
         DateTime dateTime = new DateTime(year, month, 1, 0, 0);
         // 当月最后一天
@@ -117,11 +119,28 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                     }
 
-                    List<String> lateProIds = DingUtil.getProcessByCodeAndId(Constant.LATE_PROCESS_CODE, userId, recordresult.getWorkDate(), new DateTime(recordresult.getWorkDate()).plusDays(1).toDate());
+                    List<String> lateProIds = DingUtil.getProcessByCodeAndId(Constant.LATE_PROCESS_CODE, userId, recordresult.getWorkDate(), lastDay.toDate());
 
                     if (CollectionUtils.isNotEmpty(lateProIds)) {
 
-                        lateModel.setHasProcess(Boolean.TRUE);
+                        for (String proId : lateProIds) {
+
+                            OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(proId);
+
+                            List<OapiProcessinstanceGetResponse.FormComponentValueVo> formComponentValues = processInstanceTopVo.getFormComponentValues();
+                            //日期
+                            OapiProcessinstanceGetResponse.FormComponentValueVo formDate = formComponentValues.get(0);
+
+                            //截止
+                            //  OapiProcessinstanceGetResponse.FormComponentValueVo formTime = formComponentValues.get(1);
+                            if (sdf1.format(baseCheckDate.toDate()).equals(formDate.getValue())) {
+
+                                lateModel.setHasProcess(Boolean.TRUE);
+                            }
+
+
+                        }
+
                     }
 
                     lateModels.add(lateModel);
