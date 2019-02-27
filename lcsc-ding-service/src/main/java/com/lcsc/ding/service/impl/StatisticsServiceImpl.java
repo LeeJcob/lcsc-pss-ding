@@ -300,34 +300,36 @@ public class StatisticsServiceImpl implements StatisticsService {
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
         List<String> processIds = DingUtil.getProcessByCodeAndId(Constant.SUBSIDY_PROCESS_CODE, userId, dateTime.toDate(), lastDay.toDate());
 
-        for (String process : processIds) {
+        if (CollectionUtils.isNotEmpty(processIds)) {
 
-            // 查询对应的审批
-            OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(process);
+            for (String process : processIds) {
 
-            if (processInstanceTopVo != null) {
+                // 查询对应的审批
+                OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(process);
+
+                if (processInstanceTopVo != null) {
 
 
-                SubsidyModel subsidyModel = new SubsidyModel();
-                //  审批是否通过    金额   日期  等
-                List<OapiProcessinstanceGetResponse.FormComponentValueVo> formComponentValues = processInstanceTopVo.getFormComponentValues();
-                OapiProcessinstanceGetResponse.FormComponentValueVo money = formComponentValues.get(0);
-                OapiProcessinstanceGetResponse.FormComponentValueVo date = formComponentValues.get(1);
-                subsidyModel.setMoney(new BigDecimal(money.getValue()));
-                subsidyModel.setProcessDay(date.getValue());
+                    SubsidyModel subsidyModel = new SubsidyModel();
+                    //  审批是否通过    金额   日期  等
+                    List<OapiProcessinstanceGetResponse.FormComponentValueVo> formComponentValues = processInstanceTopVo.getFormComponentValues();
+                    OapiProcessinstanceGetResponse.FormComponentValueVo money = formComponentValues.get(0);
+                    OapiProcessinstanceGetResponse.FormComponentValueVo date = formComponentValues.get(1);
+                    subsidyModel.setMoney(new BigDecimal(money.getValue()));
+                    subsidyModel.setProcessDay(date.getValue());
 
-                subsidyModel.setAgree(Boolean.FALSE);
+                    subsidyModel.setAgree(Boolean.FALSE);
 
-                if (Constant.PROCESS_RESULT_AGREE.equals(processInstanceTopVo.getResult()) && Constant.PROCESS_RESULT_COMPLETED.equals(processInstanceTopVo.getStatus())) {
+                    if (Constant.PROCESS_RESULT_AGREE.equals(processInstanceTopVo.getResult()) && Constant.PROCESS_RESULT_COMPLETED.equals(processInstanceTopVo.getStatus())) {
 
-                    subsidyModel.setAgree(Boolean.TRUE);
+                        subsidyModel.setAgree(Boolean.TRUE);
+                    }
+
+                    subsidyModels.add(subsidyModel);
                 }
 
-                subsidyModels.add(subsidyModel);
             }
-
         }
-
         BigDecimal totalMoney = BigDecimal.ZERO;
 
         for (SubsidyModel subsidyModel : subsidyModels) {
