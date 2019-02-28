@@ -119,7 +119,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                     }
 
-                    List<String> lateProIds = DingUtil.getProcessByCodeAndId(Constant.LATE_PROCESS_CODE, userId, recordresult.getWorkDate(), lastDay.toDate());
+                    List<String> lateProIds = DingUtil.getProcessByCodeAndId(Constant.LATE_PROCESS_CODE, userId, recordresult.getWorkDate(), lastDay.plusDays(1).toDate());
 
                     if (CollectionUtils.isNotEmpty(lateProIds)) {
 
