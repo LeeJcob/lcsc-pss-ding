@@ -6,11 +6,13 @@ import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiAttendanceListRequest;
 import com.dingtalk.api.request.OapiMessageCorpconversationAsyncsendV2Request;
 import com.dingtalk.api.request.OapiProcessListbyuseridRequest;
+import com.dingtalk.api.request.OapiProcessinstanceCreateRequest;
 import com.dingtalk.api.request.OapiProcessinstanceGetRequest;
 import com.dingtalk.api.request.OapiProcessinstanceListidsRequest;
 import com.dingtalk.api.response.OapiAttendanceListResponse;
 import com.dingtalk.api.response.OapiMessageCorpconversationAsyncsendV2Response;
 import com.dingtalk.api.response.OapiProcessListbyuseridResponse;
+import com.dingtalk.api.response.OapiProcessinstanceCreateResponse;
 import com.dingtalk.api.response.OapiProcessinstanceGetResponse;
 import com.dingtalk.api.response.OapiProcessinstanceListidsResponse;
 import com.dingtalk.api.response.OapiUserGetResponse;
@@ -27,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -255,15 +258,51 @@ public class DingUtil {
         return response;
     }
 
+    /**
+     * 提交申请
+     */
+    public static void applyLate() throws ApiException {
 
-    public static void main(String args[]) {
+        DefaultDingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/processinstance/create");
+        OapiProcessinstanceCreateRequest request = new OapiProcessinstanceCreateRequest();
+        request.setAgentId(Constant.AGENT_ID);
+        request.setProcessCode(Constant.LATE_PROCESS_CODE);
+        List<OapiProcessinstanceCreateRequest.FormComponentValueVo> formComponentValues = new ArrayList<OapiProcessinstanceCreateRequest.FormComponentValueVo>();
+        //日期
+        OapiProcessinstanceCreateRequest.FormComponentValueVo vo1 = new OapiProcessinstanceCreateRequest.FormComponentValueVo();
+        vo1.setName("日期");
+        vo1.setValue("2019-09-23");
+        formComponentValues.add(vo1);
+        //截止
+        OapiProcessinstanceCreateRequest.FormComponentValueVo vo2 = new OapiProcessinstanceCreateRequest.FormComponentValueVo();
+        vo2.setName("截止");
+        vo2.setValue("2019-09-23 09:05");
+        formComponentValues.add(vo2);
+        //原因
+        OapiProcessinstanceCreateRequest.FormComponentValueVo vo3= new OapiProcessinstanceCreateRequest.FormComponentValueVo();
+        vo3.setName("原因");
+        vo3.setValue("test");
+        formComponentValues.add(vo3);
+        request.setFormComponentValues(formComponentValues);
+
+       request.setApprovers("manager4081");
+        request.setOriginatorUserId("manager4081");
+        request.setDeptId(-1L);
+        request.setCcList("");
+        request.setCcPosition("FINISH");
+        OapiProcessinstanceCreateResponse response = client.execute(request,AccessTokenUtil.getToken());
+
+        System.out.println(response.getBody());
+    }
+
+    public static void main(String args[]) throws ApiException {
         DateTime dateTime = new DateTime(2018, 12, 1, 0, 0);
 
         // 当月最后一天
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
         // getProcessByCodeAndId(Constant.LEAVE_PROCESS_CODE, "manager4081", dateTime.toDate(), lastDay.toDate());
-        getProcessById("6b2945f8-6651-4d8d-b385-79f4411473e9");
-
+       // getProcessById("6b2945f8-6651-4d8d-b385-79f4411473e9");
+        applyLate();
         // getProcessListByUserId();
     }
 

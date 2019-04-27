@@ -114,7 +114,7 @@ public class DayWarningTimer {
 
 
     @Scheduled(cron = "0 25 9 * * *")
-    // @Scheduled(cron = "*/5 * * * * ?")
+    //@Scheduled(cron = "*/5 * * * * ?")
     public void sumbitSubsidyTimer() {
 
         try {
@@ -128,10 +128,10 @@ public class DayWarningTimer {
             Date userCheckTime = null;
 
 
-            Date today = new DateTime().minusDays(1).toDate();
+            Date today = new DateTime().toDate();
 
             //前一天
-            Date yesterday = new DateTime().minusDays(2).toDate();
+            Date yesterday = new DateTime().minusDays(1).toDate();
 
             Date checkTime = simpleDateFormat3.parse(simpleDateFormat2.format(yesterday) + " " + offTime);
 
