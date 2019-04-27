@@ -1,10 +1,8 @@
-plugins {
-    id 'java'
-}
 
-version 'unspecified'
+version = '1.0.0'
 archivesBaseName = 'lcsc-ding-core'
 sourceCompatibility = 1.8
+ 
 ext {
     springBootVar = '1.4.5.RELEASE'
 }
@@ -20,6 +18,7 @@ dependencies {
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
 // spring boot
     compile "org.springframework.boot:spring-boot-starter-web:$springBootVar"
+   // providedCompile("org.springframework.boot:spring-boot-starter-tomcat")
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVar"
     compile fileTree(dir: 'lib', includes: ['*jar'])
 
