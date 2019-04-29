@@ -34,13 +34,20 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private static HolidayUtil holidayUtil = new HolidayUtil();
 
+    /**
+     * 每月迟到记录
+     *
+     * @param userId
+     * @param year
+     * @param month
+     * @return
+     */
     @Override
     public ServiceResult<Map<String, Object>> getLateList(String userId, Integer year, Integer month) {
 
         Map<String, Object> result = new HashMap<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
         // 当月第一天
         DateTime dateTime = new DateTime(year, month, 1, 0, 0);
@@ -51,22 +58,15 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<LateModel> lateModels = new ArrayList<>();
         // 考勤结果
         OapiAttendanceListResponse response = null;
-
         String timeResult = "";
-
         // 考勤设置  九点上班
         Date baseCheckTime = null;
-
         // 打卡时间
         Date userCheckTime = null;
-
-
         while (lastDay.isAfter(endDay = getLastDayOfWeek(dateTime)) || lastDay.isEqual(endDay)) {
 
             response = DingUtil.getAttendanceByUserId(dateTime.toDate(), endDay.toDate(), userId);
-
             dateTime = endDay.plusDays(1);
-
             if (null == response) {
 
                 continue;
@@ -74,12 +74,10 @@ public class StatisticsServiceImpl implements StatisticsService {
 
             //根据考勤结果  解析异常考勤
             List<OapiAttendanceListResponse.Recordresult> recordresultList = response.getRecordresult();
-
             if (CollectionUtils.isEmpty(recordresultList)) {
 
                 continue;
             }
-
 
             for (OapiAttendanceListResponse.Recordresult recordresult : recordresultList) {
 
@@ -87,36 +85,30 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                     continue;
                 }
-
                 baseCheckTime = recordresult.getBaseCheckTime();
                 DateTime baseCheckDate = new DateTime(baseCheckTime);
-
                 timeResult = recordresult.getTimeResult();
-
                 if (Constant.TIMERESULT_LATE.equals(timeResult) || Constant.TIMERESULT_SERIOUSLATE.equals(timeResult) || Constant.TIMERESULT_ABSENTEEISM.equals(timeResult)) {
+
                     LateModel lateModel = new LateModel();
-
                     lateModel.setLateDay(sdf.format(recordresult.getWorkDate()));
-
-
                     lateModel.setHasProcess(Boolean.FALSE);
+
                     userCheckTime = recordresult.getUserCheckTime();
                     lateModel.setSignTime(sdf.format(userCheckTime));
+
                     DateTime user = new DateTime(userCheckTime);
                     Period p = new Period(baseCheckDate, user, PeriodType.minutes());
-
                     lateModel.setLateMinutes(p.getMinutes());
                     // 迟到有相关的审批
                     if (StringUtils.isNotEmpty(recordresult.getProcInstId())) {
 
                         OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(recordresult.getProcInstId());
-
                         if (Constant.PROCESS_RESULT_AGREE.equals(processInstanceTopVo.getResult())) {
 
                             //  审批是否通过
                             lateModel.setHasProcess(Boolean.TRUE);
                         }
-
                     }
 
                     List<String> lateProIds = DingUtil.getProcessByCodeAndId(Constant.LATE_PROCESS_CODE, userId, recordresult.getWorkDate(), lastDay.plusDays(1).toDate());
@@ -126,30 +118,21 @@ public class StatisticsServiceImpl implements StatisticsService {
                         for (String proId : lateProIds) {
 
                             OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(proId);
-
                             List<OapiProcessinstanceGetResponse.FormComponentValueVo> formComponentValues = processInstanceTopVo.getFormComponentValues();
                             //日期
                             OapiProcessinstanceGetResponse.FormComponentValueVo formDate = formComponentValues.get(0);
-
                             //截止
                             //  OapiProcessinstanceGetResponse.FormComponentValueVo formTime = formComponentValues.get(1);
                             if (sdf1.format(baseCheckDate.toDate()).equals(formDate.getValue())) {
 
                                 lateModel.setHasProcess(Boolean.TRUE);
                             }
-
-
                         }
-
                     }
-
                     lateModels.add(lateModel);
                 }
-
             }
-
         }
-
         Integer totalMinutes = 0;
         for (LateModel lateModel : lateModels) {
 
@@ -157,7 +140,6 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                 totalMinutes = totalMinutes + lateModel.getLateMinutes();
             }
-
         }
 
         result.put("totalMinutes", totalMinutes);
@@ -165,17 +147,22 @@ public class StatisticsServiceImpl implements StatisticsService {
         return ServiceResult.success(result);
     }
 
+    /**
+     * 漏打卡记录
+     *
+     * @param userId
+     * @param year
+     * @param month
+     * @return
+     */
     @Override
     public ServiceResult<List<NoSignModel>> getNoSignList(String userId, Integer year, Integer month) {
 
         // 当月第一天
         DateTime dateTime = new DateTime(year, month, 1, 0, 0);
-
         // 当月最后一天
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
-
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-
         SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
 
         // 如果当前时间还小于最后天，那lastDay为当前时间
@@ -186,21 +173,15 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
 
         DateTime endDay = dateTime.plusDays(6);
-
         endDay = endDay.isAfter(lastDay) ? lastDay : endDay;
-
         // 考勤结果
         OapiAttendanceListResponse response = null;
-
         List<NoSignModel> noSignModelList = new ArrayList<>();
-
         while (lastDay.isAfter(endDay) || lastDay.isEqual(endDay)) {
 
             response = DingUtil.getAttendanceByUserId(dateTime.toDate(), endDay.toDate(), userId);
-
             //根据考勤结果  解析漏打卡的
             List<OapiAttendanceListResponse.Recordresult> recordresultList = response.getRecordresult();
-
             dateTime = endDay.plusDays(1);
 
             if (!endDay.isEqual(lastDay)) {
@@ -211,7 +192,6 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                 endDay = dateTime.plusDays(6);
             }
-
             if (CollectionUtils.isEmpty(recordresultList)) {
 
                 continue;
@@ -224,12 +204,9 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                     continue;
                 }
-
                 Boolean flag = Boolean.FALSE;
-
                 // 如果有打卡记录，且时间结果不是未打卡
                 if ("NotSigned".equals(recordResult.getTimeResult())) {
-
 
                     NoSignModel noSignModel = new NoSignModel();
                     noSignModel.setNoSignDay(recordResult.getWorkDate());
@@ -239,16 +216,13 @@ public class StatisticsServiceImpl implements StatisticsService {
                     if (StringUtils.isNotEmpty(recordResult.getProcInstId())) {
 
                         flag = true;
-
                     } else {
 
                         // 判断是否有提交漏打卡
                         List<String> noSignProIds = DingUtil.getProcessByCodeAndId(Constant.LACK_CARD_PROCESS_CODE, userId, recordResult.getWorkDate(), new Date());
-
                         for (String proId : noSignProIds) {
 
                             OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(proId);
-
                             if (processInstanceTopVo != null) {
 
                                 List<OapiProcessinstanceGetResponse.FormComponentValueVo> formComponentValues = processInstanceTopVo.getFormComponentValues();
@@ -265,15 +239,11 @@ public class StatisticsServiceImpl implements StatisticsService {
 
                                     e.printStackTrace();
                                 }
-
-
                             }
                         }
                     }
                     noSignModel.setHasProcess(flag);
-
                     noSignModelList.add(noSignModel);
-
                 } else if ("APPROVE".equals(recordResult.getSourceType())) {
 
                     NoSignModel noSignModel = new NoSignModel();
@@ -288,6 +258,14 @@ public class StatisticsServiceImpl implements StatisticsService {
         return ServiceResult.success(noSignModelList);
     }
 
+    /**
+     * 交通补贴汇总
+     *
+     * @param userId
+     * @param year
+     * @param month
+     * @return
+     */
     @Override
     public ServiceResult<Map<String, Object>> getSubsidyList(String userId, Integer year, Integer month) {
 
@@ -295,20 +273,16 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<SubsidyModel> subsidyModels = new ArrayList<>();
         // 获取用户所有的报销申请
         DateTime dateTime = new DateTime(year, month, 1, 0, 0);
-
         // 当月最后一天
         DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
         List<String> processIds = DingUtil.getProcessByCodeAndId(Constant.SUBSIDY_PROCESS_CODE, userId, dateTime.toDate(), lastDay.toDate());
-
         if (CollectionUtils.isNotEmpty(processIds)) {
 
             for (String process : processIds) {
 
                 // 查询对应的审批
                 OapiProcessinstanceGetResponse.ProcessInstanceTopVo processInstanceTopVo = DingUtil.getProcessById(process);
-
                 if (processInstanceTopVo != null) {
-
 
                     SubsidyModel subsidyModel = new SubsidyModel();
                     //  审批是否通过    金额   日期  等
@@ -317,21 +291,17 @@ public class StatisticsServiceImpl implements StatisticsService {
                     OapiProcessinstanceGetResponse.FormComponentValueVo date = formComponentValues.get(1);
                     subsidyModel.setMoney(new BigDecimal(money.getValue()));
                     subsidyModel.setProcessDay(date.getValue());
-
                     subsidyModel.setAgree(Boolean.FALSE);
 
                     if (Constant.PROCESS_RESULT_AGREE.equals(processInstanceTopVo.getResult()) && Constant.PROCESS_RESULT_COMPLETED.equals(processInstanceTopVo.getStatus())) {
 
                         subsidyModel.setAgree(Boolean.TRUE);
                     }
-
                     subsidyModels.add(subsidyModel);
                 }
-
             }
         }
         BigDecimal totalMoney = BigDecimal.ZERO;
-
         for (SubsidyModel subsidyModel : subsidyModels) {
 
             if (subsidyModel.getAgree()) {
