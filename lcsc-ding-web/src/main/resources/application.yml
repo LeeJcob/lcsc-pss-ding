@@ -1,0 +1,8 @@
+server:
+  context-path: /
+  port: 8080
+spring:
+    mvc:
+      view:
+        prefix: /static/views
+        suffix: .html
