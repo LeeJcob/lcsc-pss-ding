@@ -4,12 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiAttendanceListRequest;
+import com.dingtalk.api.request.OapiMediaUploadRequest;
 import com.dingtalk.api.request.OapiMessageCorpconversationAsyncsendV2Request;
 import com.dingtalk.api.request.OapiProcessListbyuseridRequest;
 import com.dingtalk.api.request.OapiProcessinstanceCreateRequest;
 import com.dingtalk.api.request.OapiProcessinstanceGetRequest;
 import com.dingtalk.api.request.OapiProcessinstanceListidsRequest;
 import com.dingtalk.api.response.OapiAttendanceListResponse;
+import com.dingtalk.api.response.OapiMediaUploadResponse;
 import com.dingtalk.api.response.OapiMessageCorpconversationAsyncsendV2Response;
 import com.dingtalk.api.response.OapiProcessListbyuseridResponse;
 import com.dingtalk.api.response.OapiProcessinstanceCreateResponse;
@@ -18,6 +20,7 @@ import com.dingtalk.api.response.OapiProcessinstanceListidsResponse;
 import com.dingtalk.api.response.OapiUserGetResponse;
 import com.lcsc.ding.core.constant.Constant;
 import com.taobao.api.ApiException;
+import com.taobao.api.FileItem;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
@@ -166,6 +169,39 @@ public class DingUtil {
         try {
 
             OapiMessageCorpconversationAsyncsendV2Response response = pushClient.execute(pushRequest, AccessTokenUtil.getToken());
+     System.out.println(response);
+        } catch (ApiException e) {
+
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 推送多个，逗号隔开
+     * 文本推送
+     */
+    public static void pushLink(String userIds, String text) {
+
+        DingTalkClient pushClient = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2");
+
+        OapiMessageCorpconversationAsyncsendV2Request pushRequest = new OapiMessageCorpconversationAsyncsendV2Request();
+    //    pushRequest.setUseridList(userIds);
+        pushRequest.setAgentId(Constant.AGENT_ID);
+        pushRequest.setToAllUser(true);
+        OapiMessageCorpconversationAsyncsendV2Request.Msg msg = new OapiMessageCorpconversationAsyncsendV2Request.Msg();
+        msg.setMsgtype("link");
+        msg.setLink(new OapiMessageCorpconversationAsyncsendV2Request.Link());
+
+        msg.getLink().setMessageUrl(text);
+        msg.getLink().setText("逗你玩");
+        msg.getLink().setPicUrl("@lADPDeC2uZ1WUuDNArzNArw");
+        msg.getLink().setTitle("点我跳ERP");
+
+        pushRequest.setMsg(msg);
+        try {
+
+            OapiMessageCorpconversationAsyncsendV2Response response = pushClient.execute(pushRequest, AccessTokenUtil.getToken());
+            System.out.println(response);
         } catch (ApiException e) {
 
             e.printStackTrace();
@@ -299,11 +335,14 @@ public class DingUtil {
         DateTime dateTime = new DateTime(2018, 12, 1, 0, 0);
 
         // 当月最后一天
-        DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
+      //  DateTime lastDay = dateTime.dayOfMonth().withMaximumValue();
         // getProcessByCodeAndId(Constant.LEAVE_PROCESS_CODE, "manager4081", dateTime.toDate(), lastDay.toDate());
        // getProcessById("6b2945f8-6651-4d8d-b385-79f4411473e9");
-        applyLate();
+       // applyLate();
         // getProcessListByUserId();
+
+  pushLink("manager4081","https://erp.szlcsc.com");
+        //     uploadMedia();
     }
 
     public static void getProcessListByUserId() {
@@ -319,4 +358,18 @@ public class DingUtil {
             e.printStackTrace();
         }
     }
+
+
+
+    public static void uploadMedia() throws ApiException {
+        DingTalkClient  client = new DefaultDingTalkClient("https://oapi.dingtalk.com/media/upload");
+        OapiMediaUploadRequest request = new OapiMediaUploadRequest();
+        request.setType("image");
+
+        request.setMedia(new FileItem("C:\\Users\\Administrator\\Downloads\\test.png"));
+        OapiMediaUploadResponse response = client.execute(request, AccessTokenUtil.getToken());
+
+        System.out.println(response);
+    }
+
 }
